@@ -16,21 +16,15 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="Source\pch">
-      <UniqueIdentifier>{572c6df5-4815-43e5-bee0-69a3102bf8f1}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Main.cpp">
-      <Filter>Source\Private</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\pch.cpp">
+    <ClCompile Include="Source\GameProject.cpp">
       <Filter>Source\Private</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Source\pch.h">
-      <Filter>Source\pch</Filter>
+    <ClInclude Include="Source\GameProject.h">
+      <Filter>Source\Public</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

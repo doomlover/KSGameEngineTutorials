@@ -11,14 +11,23 @@
     <Filter Include="Source\pch">
       <UniqueIdentifier>{8d2ee57f-e867-416b-b053-5a33fc559d3c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\Core">
-      <UniqueIdentifier>{666b6fbc-f9e5-4bf1-9aef-2dcf09584c55}</UniqueIdentifier>
+    <Filter Include="Source\Private">
+      <UniqueIdentifier>{190d73c7-561b-4c63-99f5-a63c2be91323}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\Core\Public">
+    <Filter Include="Source\Public">
       <UniqueIdentifier>{c01394a0-d6f7-4523-aeda-02f79657542d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\Core\Private">
-      <UniqueIdentifier>{190d73c7-561b-4c63-99f5-a63c2be91323}</UniqueIdentifier>
+    <Filter Include="Source\Private\Core">
+      <UniqueIdentifier>{666b6fbc-f9e5-4bf1-9aef-2dcf09584c55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Public\Core">
+      <UniqueIdentifier>{eb5ba016-c645-4d6a-8132-e2e246e2b36f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Private\Core\Windows">
+      <UniqueIdentifier>{fe2de1b5-e44e-4c32-bd94-351514687818}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Public\Core\Windows">
+      <UniqueIdentifier>{554d5210-f235-4d31-afe2-e324c7475517}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -26,18 +35,42 @@
       <Filter>Source\pch</Filter>
     </ClCompile>
     <ClCompile Include="Source\Engine.cpp">
-      <Filter>Source\Core\Private</Filter>
+      <Filter>Source\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\Windows\WindowsLaunch.cpp">
+      <Filter>Source\Private\Core\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\Windows\WindowsApplication.cpp">
+      <Filter>Source\Private\Core\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\Application.cpp">
+      <Filter>Source\Private\Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\engine_pch.h">
       <Filter>Source\pch</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Core\CoreMinimal.h">
-      <Filter>Source\Core\Public</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Engine.h">
-      <Filter>Source\Core\Public</Filter>
+      <Filter>Source\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\CoreMinimal.h">
+      <Filter>Source\Public\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\Application.h">
+      <Filter>Source\Public\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\Windows\WindowsPlatform.h">
+      <Filter>Source\Public\Core\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\Windows\WindowsApplication.h">
+      <Filter>Source\Public\Core\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\Core.h">
+      <Filter>Source\Public\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\Platform.h">
+      <Filter>Source\Public\Core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
