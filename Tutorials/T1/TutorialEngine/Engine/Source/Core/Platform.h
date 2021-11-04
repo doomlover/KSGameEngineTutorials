@@ -25,10 +25,16 @@
 #include COMPILED_PLATFORM_HEADER(Platform.h)
 
 #ifdef WINDOWS_PLATFORM
-#define KS_MAIN_ENTRY() \
+#define KS_MAIN_ENTRY(AppClass) \
 int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd) {\
-	return 0;\
+	IApp* App = new AppClass;\
+	int Result = WinMainEntry(App, hInstance, hPrevInstance, lpCmdLine, nShowCmd);\
+	delete App;\
+	return Result;\
 }
 #else
-#define KS_MAIN_ENTRY()
+#define KS_MAIN_ENTRY(AppClass)\
+int main(int argc, const char* argv[]) {\
+	return 0;\
+}
 #endif

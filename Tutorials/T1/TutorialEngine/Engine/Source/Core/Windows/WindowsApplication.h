@@ -2,19 +2,19 @@
 
 #include "Core/Application.h"
 
-KS_API void Foo();
+int KS_API WinMainEntry(IApp* App, _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd);
 
-KS_API int WinMainEntry(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd);
-
-class KS_API FApp : public IApp
+class KS_API FWinApp : public IApp
 {
+public:
+	HINSTANCE hInstance;
 
 public:
-	FApp() {}
-	virtual ~FApp() {}
+	FWinApp() {}
+	virtual ~FWinApp();
 	virtual void Init() override;
+	virtual void Tick() override {}
 	virtual void Shutdown() override {}
-	static void Foo();
 };
 
-//extern IApp* CreateApplication();
+typedef FWinApp FGenericApp;

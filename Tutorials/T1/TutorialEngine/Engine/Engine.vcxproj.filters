@@ -37,9 +37,6 @@
     <ClCompile Include="Source\Engine.cpp">
       <Filter>Source\Private</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Core\Windows\WindowsLaunch.cpp">
-      <Filter>Source\Private\Core\Windows</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Core\Windows\WindowsApplication.cpp">
       <Filter>Source\Private\Core\Windows</Filter>
     </ClCompile>
