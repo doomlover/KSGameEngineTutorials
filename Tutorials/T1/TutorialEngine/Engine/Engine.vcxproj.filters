@@ -29,6 +29,15 @@
     <Filter Include="Source\Public\Core\Windows">
       <UniqueIdentifier>{554d5210-f235-4d31-afe2-e324c7475517}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Public\RHI">
+      <UniqueIdentifier>{1c1a5586-28b5-41b0-a29f-8a6d0913aab6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Private\RHI">
+      <UniqueIdentifier>{8ccbc2e4-4c48-4b55-b848-8cb782671584}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Public\RHI\D3D12">
+      <UniqueIdentifier>{9d568763-9967-4db8-9906-d1b87e29343a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\engine_pch.cpp">
@@ -68,6 +77,12 @@
     </ClInclude>
     <ClInclude Include="Source\Core\Platform.h">
       <Filter>Source\Public\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\RHI\d3d12x.h">
+      <Filter>Source\Public\RHI\D3D12</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\RHI\D3D12\D3D12Common.h">
+      <Filter>Source\Public\RHI\D3D12</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

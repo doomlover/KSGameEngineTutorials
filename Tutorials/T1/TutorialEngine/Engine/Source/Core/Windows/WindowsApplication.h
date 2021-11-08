@@ -8,13 +8,18 @@ class KS_API FWinApp : public IApp
 {
 public:
 	HINSTANCE hInstance;
+	int WindowWidth;
+	int WindowHeight;
 
 public:
-	FWinApp() {}
+	FWinApp();
 	virtual ~FWinApp();
 	virtual void Init() override;
-	virtual void Tick() override {}
-	virtual void Shutdown() override {}
+	//virtual void Tick() override {}
+	//virtual void Shutdown() override {}
+
+private:
+	int CreateAndShowWindow();
 };
 
 typedef FWinApp FGenericApp;

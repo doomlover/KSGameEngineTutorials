@@ -3,14 +3,22 @@
 #ifdef WINDOWS_PLATFORM
 
 #include "Core/Windows/WindowsApplication.h"
+#include "Engine.h"
 
 #define MAX_NAME_STRING 256
 #define HInstance() GetModuleHandle(NULL)
 
 WCHAR WindowClass[MAX_NAME_STRING];
 WCHAR WindowTitle[MAX_NAME_STRING];
-int WindowWidth;
-int WindowHeight;
+
+void CreateWindowClass();
+
+FWinApp::FWinApp()
+	:hInstance(nullptr)
+	,WindowWidth(800)
+	,WindowHeight(600)
+{
+}
 
 FWinApp::~FWinApp()
 {
@@ -18,6 +26,22 @@ FWinApp::~FWinApp()
 
 void FWinApp::Init()
 {
+	hInstance = HInstance();
+
+	// TODO : use config file
+	/* Initialize Global Variables */
+	wcscpy_s(WindowClass, TEXT("TutorialGameWindow"));
+	wcscpy_s(WindowTitle, TEXT("TutorialWindow"));
+	WindowWidth = 800;
+	WindowHeight = 600;
+
+	/* Create Window Class */
+	CreateWindowClass();
+
+	/* Create and Display our Window */
+	CreateAndShowWindow();
+
+	IApp::Init();
 }
 
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wparam, LPARAM lparam)
@@ -29,18 +53,6 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wparam, LPARAM lpara
 		break;
 	}
 	return DefWindowProc(hWnd, message, wparam, lparam);
-}
-
-void InitConfig()
-{
-	wcscpy_s(WindowClass, TEXT("TutorialGameWindow"));
-	wcscpy_s(WindowTitle, TEXT("TutorialWindow"));
-	WindowWidth = 800;
-	WindowHeight = 600;
-
-	FWinApp* WinApp = static_cast<FWinApp*>(GApp);
-	WinApp->hInstance = HInstance();
-	WinApp->Init();
 }
 
 void CreateWindowClass()
@@ -68,7 +80,7 @@ void CreateWindowClass()
 	RegisterClassEx(&wcex);
 }
 
-int CreateAndShowWindow()
+int FWinApp::CreateAndShowWindow()
 {
 	HWND hWnd = CreateWindow(WindowClass, WindowTitle, WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, 0, WindowWidth, WindowHeight, nullptr, nullptr, HInstance(), nullptr);
@@ -80,8 +92,13 @@ int CreateAndShowWindow()
 	return ShowWindow(hWnd, SW_SHOW);
 }
 
-void GameLoop()
+int WinMainEntry(IApp* App, _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd)
 {
+	GApp = App;
+
+	ks::engine::Init();
+
+	/* Listen for Message events*/
 	MSG msg = { 0 };
 	while (msg.message != WM_QUIT)
 	{
@@ -91,27 +108,10 @@ void GameLoop()
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
-
-		GApp->Tick();
+		ks::engine::Tick();
 	}
-	GApp->Shutdown();
-}
 
-int WinMainEntry(IApp* App, _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd)
-{
-	GApp = App;
-
-	/* Initialize Global Variables */
-	InitConfig();
-
-	/* Create Window Class */
-	CreateWindowClass();
-
-	/* Create and Display our Window */
-	if (CreateAndShowWindow() != 0) return -1;
-
-	/* Listen for Message events*/
-	GameLoop();
+	ks::engine::Shutdown();
 
 	return 0;
 }

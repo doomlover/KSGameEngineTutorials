@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 #ifdef KS_ENGINE
 #define KS_API __declspec(dllexport)
 #else
@@ -9,6 +11,10 @@
 #ifdef _WINDOWS
 #define WINDOWS_PLATFORM
 #define PLATFORM_HEADER Windows
+#endif
+
+#ifdef _DEBUG
+#define KS_DEBUG_BUILD
 #endif
 
 // Turns an preprocessor token into a real string (see UBT_COMPILED_PLATFORM)
@@ -38,3 +44,11 @@ int main(int argc, const char* argv[]) {\
 	return 0;\
 }
 #endif
+
+// base types
+typedef int8_t		int8;
+typedef int32_t		int32;
+typedef int64_t		int64;
+typedef uint8_t		uint8;
+typedef uint32_t	uint32;
+typedef uint64_t	uint64;

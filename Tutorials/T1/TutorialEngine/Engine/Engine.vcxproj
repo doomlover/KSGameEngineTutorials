@@ -173,6 +173,8 @@
     <ClInclude Include="Source\Core\Windows\WindowsPlatform.h" />
     <ClInclude Include="Source\Engine.h" />
     <ClInclude Include="Source\engine_pch.h" />
+    <ClInclude Include="Source\RHI\d3d12x.h" />
+    <ClInclude Include="Source\RHI\D3D12\D3D12Common.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -5,8 +5,10 @@ class GameApp : public FGenericApp
 public:
 	GameApp() {}
 	virtual ~GameApp() {}
-	virtual void Init() override {}
-	virtual void Shutdown() override {}
+protected:
+	virtual void OnInit() override {}
+	virtual void OnTick() override {}
+	virtual void OnShutdown() override {}
 };
 
 KS_MAIN_ENTRY(GameApp)
