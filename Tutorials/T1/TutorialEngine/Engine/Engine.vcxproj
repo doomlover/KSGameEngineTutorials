@@ -163,6 +163,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Source\RHI\D3D12\D3D12RHI.cpp" />
+    <ClCompile Include="Source\RHI\RHI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Core\Application.h" />
@@ -176,6 +178,8 @@
     <ClInclude Include="Source\engine_pch.h" />
     <ClInclude Include="Source\RHI\d3d12x.h" />
     <ClInclude Include="Source\RHI\D3D12\D3D12Common.h" />
+    <ClInclude Include="Source\RHI\D3D12\D3D12RHI.h" />
+    <ClInclude Include="Source\RHI\RHI.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

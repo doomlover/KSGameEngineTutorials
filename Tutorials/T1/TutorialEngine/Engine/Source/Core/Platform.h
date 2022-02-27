@@ -46,3 +46,5 @@ typedef uint64_t	uint64;
 #endif
 #define TEXT(x) TEXT_PASTE(x)
 #endif
+
+using namespace std;

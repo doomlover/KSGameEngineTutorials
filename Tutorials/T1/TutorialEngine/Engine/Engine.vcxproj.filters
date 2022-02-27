@@ -38,6 +38,9 @@
     <Filter Include="Source\Public\RHI\D3D12">
       <UniqueIdentifier>{9d568763-9967-4db8-9906-d1b87e29343a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Private\RHI\D3D12">
+      <UniqueIdentifier>{9c4931ad-c1bb-4e92-9b73-8c09610a4312}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\engine_pch.cpp">
@@ -51,6 +54,12 @@
     </ClCompile>
     <ClCompile Include="Source\Core\Application.cpp">
       <Filter>Source\Private\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\RHI\RHI.cpp">
+      <Filter>Source\Private\RHI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\RHI\D3D12\D3D12RHI.cpp">
+      <Filter>Source\Private\RHI\D3D12</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -86,6 +95,12 @@
     </ClInclude>
     <ClInclude Include="Source\Core\EntryPoint.h">
       <Filter>Source\Public\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\RHI\RHI.h">
+      <Filter>Source\Public\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\RHI\D3D12\D3D12RHI.h">
+      <Filter>Source\Public\RHI\D3D12</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

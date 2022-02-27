@@ -4,6 +4,8 @@
 #include "Core/Windows/WindowsApplication.h"
 
 #ifndef KS_INFO
-#define KS_INFO(x) OutputDebugString(x)
+#define KS_INFO(x) \
+OutputDebugString(x);\
+OutputDebugString(TEXT("\n"))
 #endif
 

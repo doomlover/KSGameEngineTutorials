@@ -5,6 +5,8 @@
 #include "Core/Windows/WindowsApplication.h"
 #include "Engine.h"
 
+using namespace ks;
+
 #define MAX_NAME_STRING 256
 #define HInstance() GetModuleHandle(NULL)
 
@@ -26,6 +28,8 @@ FWinApp::~FWinApp()
 
 void FWinApp::Init()
 {
+	KS_INFO(TEXT("FWinApp::Init"));
+
 	hInstance = HInstance();
 
 	// TODO : use config file
@@ -94,7 +98,7 @@ int FWinApp::CreateAndShowWindow()
 
 int KS_API WinMainEntry(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd)
 {
-	ks::engine::Init();
+	engine::Init();
 
 	/* Listen for Message events*/
 	MSG msg = { 0 };
@@ -106,10 +110,10 @@ int KS_API WinMainEntry(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstan
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
-		ks::engine::Tick();
+		engine::Tick();
 	}
 
-	ks::engine::Shutdown();
+	engine::Shutdown();
 
 	return 0;
 }
