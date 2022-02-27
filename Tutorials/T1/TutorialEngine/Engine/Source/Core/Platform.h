@@ -30,21 +30,6 @@
 
 #include COMPILED_PLATFORM_HEADER(Platform.h)
 
-#ifdef WINDOWS_PLATFORM
-#define KS_MAIN_ENTRY(AppClass) \
-int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd) {\
-	IApp* App = new AppClass;\
-	int Result = WinMainEntry(App, hInstance, hPrevInstance, lpCmdLine, nShowCmd);\
-	delete App;\
-	return Result;\
-}
-#else
-#define KS_MAIN_ENTRY(AppClass)\
-int main(int argc, const char* argv[]) {\
-	return 0;\
-}
-#endif
-
 // base types
 typedef int8_t		int8;
 typedef int32_t		int32;
@@ -52,3 +37,12 @@ typedef int64_t		int64;
 typedef uint8_t		uint8;
 typedef uint32_t	uint32;
 typedef uint64_t	uint64;
+
+#if !defined(TEXT)
+#if PLATFORM_TCHAR_IS_CHAR16
+#define TEXT_PASTE(x) u ## x
+#else
+#define TEXT_PASTE(x) L ## x
+#endif
+#define TEXT(x) TEXT_PASTE(x)
+#endif

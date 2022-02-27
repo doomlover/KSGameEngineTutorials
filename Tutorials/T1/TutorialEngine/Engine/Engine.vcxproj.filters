@@ -84,5 +84,8 @@
     <ClInclude Include="Source\RHI\D3D12\D3D12Common.h">
       <Filter>Source\Public\RHI\D3D12</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Core\EntryPoint.h">
+      <Filter>Source\Public\Core</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -2,7 +2,7 @@
 
 #include "Core/Application.h"
 
-int KS_API WinMainEntry(IApp* App, _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd);
+int KS_API WinMainEntry(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd);
 
 class KS_API FWinApp : public IApp
 {

@@ -1,4 +1,6 @@
 #include "GameProject.h"
+#include "Core/CoreMinimal.h"
+#include "Core/EntryPoint.h"
 
 class GameApp : public FGenericApp
 {
@@ -11,4 +13,4 @@ protected:
 	virtual void OnShutdown() override {}
 };
 
-KS_MAIN_ENTRY(GameApp)
+KS_CREATE_APP(GameApp)

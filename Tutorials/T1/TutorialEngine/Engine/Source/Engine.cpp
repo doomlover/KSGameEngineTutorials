@@ -55,6 +55,11 @@ void ks::engine::Init()
 {
 	GApp->Init();
 
+	gfx::Init();
+	graphics::Init();
+	RHI::Init();
+	// RHI::DrawIndexedInstance(MeshBatch/Primitive/RenderItem/GeoMesh);
+
 	// Create and initialize RHI
 	{
 		KS_D3D12_CALL(CreateDXGIFactory1(IID_PPV_ARGS(&ks::d3d12::mdxgiFactory)));
@@ -88,6 +93,7 @@ void ks::engine::Init()
 void ks::engine::Tick()
 {
 	GApp->Tick();
+	// RHI::Tick();
 }
 
 void ks::engine::Shutdown()
