@@ -19,10 +19,12 @@ namespace ks
 		void Init();
 		void Tick();
 		void Shutdown();
+		void LoadMap();
 
 	protected:
 		IRHI* RHI = nullptr;
 	};
 
 	extern FEngine* GEngine;
+	extern std::wstring GCmdLineArgs;
 }

@@ -2,12 +2,16 @@
 
 #include "Core/Application.h"
 
-int KS_API WinMainEntry(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd);
+int KS_API WindowsEntry(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd);
+
+namespace ks
+{
+	extern HINSTANCE GHINSTANCE;
+}
 
 class KS_API FWinApp : public IApp
 {
 public:
-	HINSTANCE hInstance;
 	int WindowWidth;
 	int WindowHeight;
 

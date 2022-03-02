@@ -7,6 +7,7 @@ namespace ks
 
 class KS_API IApp
 {
+	friend ks::FEngine;
 public:
 	virtual ~IApp();
 	virtual void Init();
@@ -21,6 +22,8 @@ protected:
 	virtual void OnShutdown() = 0;
 
 	ks::FEngine* Engine = nullptr;
+	// IApp暂时记录Config参数
+	std::wstring StartMap;
 };
 
 extern KS_API IApp* GApp;

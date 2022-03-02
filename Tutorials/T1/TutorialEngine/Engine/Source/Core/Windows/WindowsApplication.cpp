@@ -15,9 +15,13 @@ WCHAR WindowTitle[MAX_NAME_STRING];
 
 void CreateWindowClass();
 
+namespace ks
+{
+	HINSTANCE GHINSTANCE;
+}
+
 FWinApp::FWinApp()
-	:hInstance(nullptr)
-	,WindowWidth(800)
+	:WindowWidth(800)
 	,WindowHeight(600)
 {
 }
@@ -30,7 +34,7 @@ void FWinApp::Init()
 {
 	KS_INFO(TEXT("FWinApp::Init"));
 
-	hInstance = HInstance();
+	assert(HInstance() == GHINSTANCE);
 
 	// TODO : use config file
 	/* Initialize Global Variables */
@@ -96,8 +100,40 @@ int FWinApp::CreateAndShowWindow()
 	return ShowWindow(hWnd, SW_SHOW);
 }
 
-int KS_API WinMainEntry(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd)
+int KS_API WindowsEntry(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd)
 {
+	GHINSTANCE = hInstance;
+
+	// Get command line arguments
+	std::wstring CmdLineArgs = TEXT("");
+	{
+		int argc = 0;
+		LPWSTR* argv = ::CommandLineToArgvW(::GetCommandLineW(), &argc);
+		if (argv != nullptr)
+		{
+			// jump the program name
+			for (int32 i = 1; i < argc; ++i)
+			{
+				CmdLineArgs += TEXT(" ");
+				wstring ArgStr = argv[i];
+				CmdLineArgs += ArgStr;
+			}
+			::LocalFree(argv);
+		}
+	}
+	GCmdLineArgs = CmdLineArgs;
+	KS_INFO(CmdLineArgs.c_str());
+
+	/*
+	engine::Init();
+	while(!engine::RequestExit())
+	{
+		engine::PumpMessages();
+		engine::Tick();
+	}
+	engine::Shutdown();
+	*/
+
 	engine::Init();
 
 	/* Listen for Message events*/
@@ -105,7 +141,7 @@ int KS_API WinMainEntry(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstan
 	while (msg.message != WM_QUIT)
 	{
 		// If there are Window messages then process them
-		if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
+		while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
 		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);

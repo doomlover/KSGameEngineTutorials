@@ -1,9 +1,11 @@
 
 #include "engine_pch.h"
+#include "Engine.h"
 
 namespace ks
 {
 	FEngine* GEngine = nullptr;
+	std::wstring GCmdLineArgs;
 
 	namespace engine
 	{
@@ -11,11 +13,11 @@ namespace ks
 		{
 			KS_INFO(TEXT("engine::Init"));
 			GApp->Init();
+			GEngine->LoadMap();
 		}
 
 		void Tick()
 		{
-			//KS_INFO(TEXT("engine::Tick"));
 			GApp->Tick();
 		}
 
@@ -58,6 +60,11 @@ namespace ks
 	{
 		KS_INFO(TEXT("FEngine::Shutdown"));
 		RHI->Shutdown();
+	}
+
+	void FEngine::LoadMap()
+	{
+		KS_INFO(GApp->StartMap.c_str());
 	}
 
 }

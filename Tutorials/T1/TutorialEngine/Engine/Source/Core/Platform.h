@@ -37,6 +37,7 @@ typedef int64_t		int64;
 typedef uint8_t		uint8;
 typedef uint32_t	uint32;
 typedef uint64_t	uint64;
+typedef wchar_t		TCHAR;
 
 #if !defined(TEXT)
 #if PLATFORM_TCHAR_IS_CHAR16
@@ -46,5 +47,3 @@ typedef uint64_t	uint64;
 #endif
 #define TEXT(x) TEXT_PASTE(x)
 #endif
-
-using namespace std;

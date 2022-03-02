@@ -9,8 +9,8 @@ int CALLBACK WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	KS_INFO(TEXT("WinMain"));
 	extern std::unique_ptr<IApp> CreateApplication();
 	auto App = CreateApplication();
-	extern int KS_API WinMainEntry(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd);
-	return WinMainEntry(hInstance, hPrevInstance, lpCmdLine, nShowCmd);
+	extern int KS_API WindowsEntry(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nShowCmd);
+	return WindowsEntry(hInstance, hPrevInstance, lpCmdLine, nShowCmd);
 }
 
 #define KS_CREATE_APP(AppClass) \
