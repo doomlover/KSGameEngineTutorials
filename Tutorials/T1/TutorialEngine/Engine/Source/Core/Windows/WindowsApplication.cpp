@@ -6,8 +6,6 @@
 
 #include "Core/Windows/WindowsApplication.h"
 
-using namespace ks;
-
 #define MAX_NAME_STRING 256
 #define HInstance() GetModuleHandle(NULL)
 
@@ -21,9 +19,9 @@ namespace ks
 	HINSTANCE GHINSTANCE;
 
 	FWinApp::FWinApp()
-		:WindowWidth(800)
-		,WindowHeight(600)
 	{
+		WinX = CW_USEDEFAULT;
+		WinY = 0;
 	}
 
 	FWinApp::~FWinApp()
@@ -40,8 +38,6 @@ namespace ks
 		/* Initialize Global Variables */
 		wcscpy_s(WindowClass, TEXT("TutorialGameWindow"));
 		wcscpy_s(WindowTitle, TEXT("TutorialWindow"));
-		WindowWidth = 800;
-		WindowHeight = 600;
 
 		/* Create Window Class */
 		CreateWindowClass();
@@ -50,6 +46,26 @@ namespace ks
 		CreateAndShowWindow();
 
 		IApp::Init();
+	}
+
+	bool FWinApp::bQuit = false;
+
+	void FWinApp::PeekMessages()
+	{
+		/* Listen for Message events*/
+		MSG msg = { 0 };
+		// If there are Window messages then process them
+		while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+			if (msg.message == WM_QUIT) bQuit = true;
+		}
+	}
+
+	bool FWinApp::RequestExit()
+	{
+		return bQuit;
 	}
 
 	LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wparam, LPARAM lparam)
@@ -90,8 +106,8 @@ namespace ks
 
 	int FWinApp::CreateAndShowWindow()
 	{
-		HWND hWnd = CreateWindow(WindowClass, WindowTitle, WS_OVERLAPPEDWINDOW,
-			CW_USEDEFAULT, 0, WindowWidth, WindowHeight, nullptr, nullptr, HInstance(), nullptr);
+		hWnd = CreateWindow(WindowClass, WindowTitle, WS_OVERLAPPEDWINDOW,
+			WinX, WinY, ResX, ResY, nullptr, nullptr, HInstance(), nullptr);
 		if (!hWnd)
 		{
 			MessageBox(0, TEXT("Failed to Create Window!"), 0, 0);
@@ -124,34 +140,7 @@ namespace ks
 		GCmdLineArgs = CmdLineArgs;
 		KS_INFO(CmdLineArgs.c_str());
 
-		/*
-		engine::Init();
-		while(!engine::RequestExit())
-		{
-			engine::PumpMessages();
-			engine::Tick();
-		}
-		engine::Shutdown();
-		*/
-
-		engine::Init();
-
-		bool bQuit = false;
-		while (!bQuit)
-		{
-			/* Listen for Message events*/
-			MSG msg = { 0 };
-			// If there are Window messages then process them
-			while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
-			{
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-				if (msg.message == WM_QUIT) bQuit = true;
-			}
-			engine::Tick();
-		}
-
-		engine::Shutdown();
+		engine::Loop();
 
 		return 0;
 	}

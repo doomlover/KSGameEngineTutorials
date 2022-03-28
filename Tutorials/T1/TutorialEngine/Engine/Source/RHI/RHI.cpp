@@ -14,7 +14,7 @@ namespace ks
 	IRHI* IRHI::Create()
 	{
 		KS_INFO(TEXT("IRHI::Create"));
-		GRHI = new FD3D12RHI;
+		GRHI = new d3d12::FD3D12RHI;
 		return GRHI;
 	}
 

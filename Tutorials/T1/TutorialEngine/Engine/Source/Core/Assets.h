@@ -64,7 +64,9 @@ namespace ks
 			std::array<float, 4> rotation{ 0, 0, 0, 1 };
 			std::array<float, 3> scale{ 1, 1, 1 };
 			std::vector<int32> children;
+			int32 parent{ -1 };
 			int32 mesh{ -1 };
+			int32 camera{ -1 };
 			friend std::ostringstream& operator<<(std::ostringstream& outstream, const FNodeInfo& obj)
 			{
 				outstream << "\nname : " << obj.name.c_str() << std::endl;
@@ -106,6 +108,10 @@ namespace ks
 				if (j.contains("mesh"))
 				{
 					j.at("mesh").get_to(SceneNodeInfo.mesh);
+				}
+				if (j.contains("camera"))
+				{
+					j.at("camera").get_to(SceneNodeInfo.camera);
 				}
 			}
 		};
@@ -230,6 +236,39 @@ namespace ks
 			NLOHMANN_DEFINE_TYPE_INTRUSIVE(FBuffer, uri, byteLength)
 		};
 
+		struct FCamera
+		{
+			std::string name;
+			std::string type;
+			struct FPerspective
+			{
+				float yfov;
+				float zfar;
+				float znear;
+				NLOHMANN_DEFINE_TYPE_INTRUSIVE(FPerspective, yfov, zfar, znear)
+			} perspective{};
+
+			struct FOrthographic
+			{
+				float xmag, ymag, zfar, znear;
+				NLOHMANN_DEFINE_TYPE_INTRUSIVE(FOrthographic, xmag, ymag, zfar, znear)
+			} orthographic{};
+
+			friend void to_json(json&, const FCamera&) { assert(false); }
+			friend void from_json(const json& j, FCamera& Camera) {
+				j.at("name").get_to(Camera.name);
+				j.at("type").get_to(Camera.type);
+				if (Camera.type == "perspective")
+				{
+					j.at("perspective").get_to(Camera.perspective);
+				}
+				else
+				{
+					j.at("orthographic").get_to(Camera.orthographic);
+				}
+			}
+		};
+
 		struct FScene
 		{
 			int32 scene = -1;
@@ -239,8 +278,9 @@ namespace ks
 			std::vector<FAccessor> accessors;
 			std::vector<FBufferView> bufferViews;
 			std::vector<FBuffer> buffers;
+			std::vector<FCamera> cameras;
 			std::string root;
-			NLOHMANN_DEFINE_TYPE_INTRUSIVE(FScene, scene, scenes, nodes, meshes, accessors, bufferViews, buffers)
+			NLOHMANN_DEFINE_TYPE_INTRUSIVE(FScene, scene, scenes, nodes, meshes, accessors, bufferViews, buffers, cameras)
 				friend std::ostringstream& operator<<(std::ostringstream& outstream, const FScene& obj)
 			{
 				outstream << "scene : ";
@@ -279,7 +319,7 @@ namespace ks
 		IAsset(const std::string& InPath) : Path(InPath) {}
 		virtual ~IAsset() = 0;
 		const std::string& GetPath() const { return Path; }
-
+		virtual void PostLoad() {}
 	protected:
 		std::string Path;
 		std::vector<FRefType> RefAssets;
@@ -290,11 +330,11 @@ namespace ks
 	public:
 		FSceneAsset(const std::string& GLTFPath);
 		virtual ~FSceneAsset() {}
-		int32 NumNodes() const {
+		int32 GetNumNodes() const {
 			return static_cast<int32>(GltfScene.nodes.size());
 		}
 		void GetSceneNodeInfo(int32 NodeIndex, FSceneNodeInfo& NodeInfo) const;
-
+		std::vector<FSceneNodeInfo> GetSceneNodeInfos() const;
 	private:
 		/* loading point */
 		void LoadGLTF();
@@ -312,7 +352,7 @@ namespace ks
 	class FAssetManager
 	{
 	public:
-		static FAssetManager* Create() { return new FAssetManager; }
+		static FAssetManager* Create();
 		~FAssetManager() {
 			KS_INFO(TEXT("~FAssetManager"));
 		}

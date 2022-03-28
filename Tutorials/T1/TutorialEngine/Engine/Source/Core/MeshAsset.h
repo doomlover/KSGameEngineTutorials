@@ -1,31 +1,10 @@
 #pragma once
 
+#include "Core/CoreMinimal.h"
 #include "Core/Assets.h"
+#include "Render/MeshRenderData.h"
 
 namespace ks {
-	/* enum version of gltf accessor.componentType */
-	enum class EDATA_TYPE : unsigned short
-	{
-		BYTE = 5120,
-		UNSIGNED_BYTE = 5121,
-		SHORT = 5122,
-		UNSIGNED_SHORT = 5123,
-		UNSIGNED_INT = 5125,
-		FLOAT = 5126,
-		INVALID,
-	};
-	/* enum version of gltf accessor.type */
-	enum class EELEM_TYPE : unsigned short
-	{
-		SCALAR,
-		VEC2,
-		VEC3,
-		VEC4,
-		MAT2,
-		MAT3,
-		MAT4,
-		INVALID,
-	};
 
 	struct FMeshData
 	{
@@ -42,12 +21,17 @@ namespace ks {
 		FMeshData() = default;
 		FMeshData(FMeshData&& TempMeshData) noexcept
 		{
+			*this = std::move(TempMeshData);
+		}
+		FMeshData& operator=(FMeshData&& TempMeshData) noexcept
+		{
 			KeyName = std::move(TempMeshData.KeyName);
 			IndexDataType = TempMeshData.IndexDataType;
 			IndexRawData = std::move(TempMeshData.IndexRawData);
 			PositionElemType = TempMeshData.PositionElemType;
 			PositionDataType = TempMeshData.PositionDataType;
 			PositionRawData = std::move(TempMeshData.PositionRawData);
+			return *this;
 		}
 	};
 
@@ -56,8 +40,16 @@ namespace ks {
 	public:
 		FStaticMeshAsset(const std::string& Path, FMeshData& InMeshData) :IAsset(Path), MeshData(std::move(InMeshData)) {}
 		virtual ~FStaticMeshAsset() {}
+		virtual void PostLoad() override;
+		FMeshRenderData* GetRenderData() { return RenderData.get(); }
 
 	private:
+		void InitRenderData();
+
+		// raw data
 		FMeshData MeshData;
+		// rendering, render data
+		std::unique_ptr<FMeshRenderData> RenderData;
 	};
+
 }

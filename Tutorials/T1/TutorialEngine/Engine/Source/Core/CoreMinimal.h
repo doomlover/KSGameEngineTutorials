@@ -14,6 +14,9 @@
 #include <unordered_map>
 #include <vector>
 #include <array>
+#include <set>
+#include <queue>
+#include <deque>
 
 #include "Core/Platform.h"
 #include "Core/Math.h"
@@ -23,6 +26,49 @@ using json = nlohmann::json;
 
 namespace ks
 {
+	/* enum version of gltf accessor.componentType */
+	enum class EDATA_TYPE : unsigned short
+	{
+		BYTE = 5120,
+		UNSIGNED_BYTE = 5121,
+		SHORT = 5122,
+		UNSIGNED_SHORT = 5123,
+		UNSIGNED_INT = 5125,
+		FLOAT = 5126,
+		INVALID,
+	};
+	/* enum version of gltf accessor.type */
+	enum class EELEM_TYPE : unsigned short
+	{
+		SCALAR,
+		VEC2,
+		VEC3,
+		VEC4,
+		MAT2,
+		MAT3,
+		MAT4,
+		INVALID,
+	};
+
+	enum class EELEM_FORMAT : unsigned int
+	{
+		R8_INT,
+		R8_UINT,
+		R16_INT,
+		R16_UINT,
+		R32G32B32_FLOAT,
+		R32G32B32A32_FLOAT,
+		INVALID,
+	};
+
+	EELEM_FORMAT GetElemFormat(EDATA_TYPE DataType, EELEM_TYPE ElemType);
+
+	uint32 GetDataTypeSize(EDATA_TYPE DataType);
+
+	std::string GetContentPath(const std::string& Path);
+
+	std::string GetShaderPath(const std::string& Path);
+
 	class KS_API FString
 	{
 	public:

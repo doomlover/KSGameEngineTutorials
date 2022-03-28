@@ -153,8 +153,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\RHI\D3D12\D3D12PipelineState.cpp" />
+    <ClCompile Include="Source\Render\RenderPass.cpp" />
     <ClCompile Include="Source\Core\Application.cpp" />
     <ClCompile Include="Source\Core\Assets.cpp" />
+    <ClCompile Include="Source\Core\MeshAsset.cpp" />
     <ClCompile Include="Source\Core\Scene.cpp" />
     <ClCompile Include="Source\Core\Windows\WindowsApplication.cpp" />
     <ClCompile Include="Source\Engine.cpp">
@@ -165,10 +168,14 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Source\Render\MeshRenderData.cpp" />
+    <ClCompile Include="Source\Render\Render.cpp" />
     <ClCompile Include="Source\RHI\D3D12\D3D12RHI.cpp" />
     <ClCompile Include="Source\RHI\RHI.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\RHI\D3D12\D3D12PipelineState.h" />
+    <ClInclude Include="Source\Render\RenderPass.h" />
     <ClInclude Include="Source\Core\Application.h" />
     <ClInclude Include="Source\Core\Assets.h" />
     <ClInclude Include="Source\Core\Core.h" />
@@ -183,10 +190,13 @@
     <ClInclude Include="Source\Core\Windows\WindowsPlatform.h" />
     <ClInclude Include="Source\Engine.h" />
     <ClInclude Include="Source\engine_pch.h" />
+    <ClInclude Include="Source\Render\MeshRenderData.h" />
+    <ClInclude Include="Source\Render\Render.h" />
     <ClInclude Include="Source\RHI\d3d12x.h" />
     <ClInclude Include="Source\RHI\D3D12\D3D12Common.h" />
     <ClInclude Include="Source\RHI\D3D12\D3D12RHI.h" />
     <ClInclude Include="Source\RHI\RHI.h" />
+    <ClInclude Include="Source\RHI\RHIPipelineStateDesc.h" />
     <ClInclude Include="Source\ThirdParty\glm\ext.hpp" />
     <ClInclude Include="Source\ThirdParty\glm\glm.hpp" />
     <ClInclude Include="Source\ThirdParty\nlohmann\json.hpp" />

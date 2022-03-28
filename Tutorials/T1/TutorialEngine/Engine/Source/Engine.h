@@ -6,6 +6,7 @@ namespace ks
 	class IRHI;
 	class FAssetManager;
 	class FScene;
+	class FRenderer;
 
 	extern FEngine* GEngine;
 	extern std::wstring GCmdLineArgs;
@@ -13,9 +14,7 @@ namespace ks
 	/* see WindowsEntry */
 	namespace engine
 	{
-		void Init();
-		void Tick();
-		void Shutdown();
+		void Loop();
 	}
 
 	class FEngine
@@ -33,5 +32,6 @@ namespace ks
 		std::unique_ptr<IRHI> RHI;
 		std::unique_ptr<FAssetManager> AssetManager;
 		std::unique_ptr<FScene> Scene;
+		std::unique_ptr<FRenderer> Renderer;
 	};
 }

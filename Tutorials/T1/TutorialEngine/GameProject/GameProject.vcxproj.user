@@ -6,10 +6,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LocalDebuggerCommandArguments>-map=/ThirdPersonExampleMap/ThirdPersonExampleMap.gltf -gfx=d3d12</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerWorkingDirectory>$(SolutionDir)Binaries</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>-map=/ThirdPersonExampleMap/ThirdPersonExampleMap.gltf -gfx=d3d12 &gt;Log.txt</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-map=/ThirdPersonExampleMap/ThirdPersonExampleMap.gltf -gfx=d3d12 -ResX=1024 -ResY=768 &gt;Log.txt</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <RemoteDebuggerCommandArguments>-map=/ThirdPersonExampleMap/ThirdPersonExampleMap.gltf -gfx=d3d12 &gt;Log.txt</RemoteDebuggerCommandArguments>
+    <LocalDebuggerWorkingDirectory>$(SolutionDir)Binaries</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
 </Project>

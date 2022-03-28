@@ -75,6 +75,10 @@
       <Command>
       </Command>
     </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>xcopy $(SolutionDir)Engine\Shaders $(SolutionDir)Binaries\Shaders\ /E/H/Y
+xcopy $(ProjectDir)Content $(SolutionDir)Binaries\Content\ /E/H/Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -102,6 +106,10 @@
       <Command>
       </Command>
     </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>xcopy $(SolutionDir)Engine\Shaders $(SolutionDir)Binaries\Shaders\ /E/H/Y
+xcopy $(ProjectDir)Content $(SolutionDir)Binaries\Content\ /E/H/Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source\GameProject.cpp" />

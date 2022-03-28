@@ -12,17 +12,17 @@ namespace ks
 	class KS_API FWinApp : public IApp
 	{
 	public:
-		int WindowWidth;
-		int WindowHeight;
+		static bool bQuit;
+		static void PeekMessages();
+		static bool RequestExit();
 
-	public:
 		FWinApp();
 		virtual ~FWinApp();
 		virtual void Init() override;
-		//virtual void Tick() override {}
-		//virtual void Shutdown() override {}
+		HWND GetHWindow() { return hWnd; }
 
 	private:
+		HWND hWnd;
 		int CreateAndShowWindow();
 	};
 

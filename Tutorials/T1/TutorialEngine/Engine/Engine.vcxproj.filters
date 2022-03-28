@@ -56,6 +56,12 @@
     <Filter Include="Source\Private\Core\Asset">
       <UniqueIdentifier>{7f532701-86ba-4d45-a808-d0f66a75998c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Public\Render">
+      <UniqueIdentifier>{33564f31-a7a0-4e67-b0ca-220e7f540d40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Private\Render">
+      <UniqueIdentifier>{10f6862c-3154-44df-8b5a-1d82d37ae189}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\engine_pch.cpp">
@@ -81,6 +87,21 @@
     </ClCompile>
     <ClCompile Include="Source\Core\Assets.cpp">
       <Filter>Source\Private\Core\Asset</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Render\Render.cpp">
+      <Filter>Source\Private\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\MeshAsset.cpp">
+      <Filter>Source\Private\Core\Asset</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Render\MeshRenderData.cpp">
+      <Filter>Source\Private\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Render\RenderPass.cpp">
+      <Filter>Source\Private\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\RHI\D3D12\D3D12PipelineState.cpp">
+      <Filter>Source\Private\RHI\D3D12</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -146,6 +167,21 @@
     </ClInclude>
     <ClInclude Include="Source\Core\MeshAsset.h">
       <Filter>Source\Public\Core\Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Render\Render.h">
+      <Filter>Source\Public\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Render\MeshRenderData.h">
+      <Filter>Source\Public\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Render\RenderPass.h">
+      <Filter>Source\Public\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\RHI\D3D12\D3D12PipelineState.h">
+      <Filter>Source\Public\RHI\D3D12</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\RHI\RHIPipelineStateDesc.h">
+      <Filter>Source\Public\RHI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
