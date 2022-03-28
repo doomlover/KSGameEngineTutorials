@@ -9,7 +9,7 @@ namespace ks
 	{
 	public:
 		FD3D12RHI() {}
-		virtual ~FD3D12RHI() {}
+		virtual ~FD3D12RHI();
 		virtual void Init() override;
 		virtual void Shutdown() override;
 

@@ -9,6 +9,12 @@
 
 namespace ks
 {
+
+	FD3D12RHI::~FD3D12RHI()
+	{
+		KS_INFO(TEXT("~FD3D12RHI"));
+	}
+
 	void FD3D12RHI::Init()
 	{
 		KS_INFO(TEXT("FD3D12RHI::Init"));
@@ -44,7 +50,7 @@ namespace ks
 
 	void FD3D12RHI::Shutdown()
 	{
-		KS_INFO(TEXT("FD3D12RHI::Shutdown"));
+		KS_INFO(TEXT("\tFD3D12RHI::Shutdown"));
 		DXGIFactory.Reset();
 		D3D12Device.Reset();
 		D3D12Fence.Reset();

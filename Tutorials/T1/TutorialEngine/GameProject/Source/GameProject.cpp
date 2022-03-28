@@ -2,7 +2,7 @@
 #include "Core/CoreMinimal.h"
 #include "Core/EntryPoint.h"
 
-class GameApp : public FGenericApp
+class GameApp : public ks::FGenericApp
 {
 public:
 	GameApp() {}

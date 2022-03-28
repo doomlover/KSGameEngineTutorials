@@ -41,6 +41,21 @@
     <Filter Include="Source\Private\RHI\D3D12">
       <UniqueIdentifier>{9c4931ad-c1bb-4e92-9b73-8c09610a4312}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ThirdParty">
+      <UniqueIdentifier>{3a39fc72-dd01-4f00-894e-fafb2c3b25a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\nlohmann">
+      <UniqueIdentifier>{0e3feff4-0a06-4381-aeba-810ee6b94240}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\glm">
+      <UniqueIdentifier>{76182c5c-84a1-4390-848d-fa03b5770a4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Public\Core\Asset">
+      <UniqueIdentifier>{6e304b0c-df03-40b9-b7ff-83d49f9b43da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Private\Core\Asset">
+      <UniqueIdentifier>{7f532701-86ba-4d45-a808-d0f66a75998c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\engine_pch.cpp">
@@ -60,6 +75,12 @@
     </ClCompile>
     <ClCompile Include="Source\RHI\D3D12\D3D12RHI.cpp">
       <Filter>Source\Private\RHI\D3D12</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\Scene.cpp">
+      <Filter>Source\Private\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\Assets.cpp">
+      <Filter>Source\Private\Core\Asset</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -101,6 +122,30 @@
     </ClInclude>
     <ClInclude Include="Source\RHI\D3D12\D3D12RHI.h">
       <Filter>Source\Public\RHI\D3D12</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ThirdParty\nlohmann\json.hpp">
+      <Filter>ThirdParty\nlohmann</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\Math.h">
+      <Filter>Source\Public\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\Json.h">
+      <Filter>Source\Public\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ThirdParty\glm\ext.hpp">
+      <Filter>ThirdParty\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ThirdParty\glm\glm.hpp">
+      <Filter>ThirdParty\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\Scene.h">
+      <Filter>Source\Public\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\Assets.h">
+      <Filter>Source\Public\Core\Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\MeshAsset.h">
+      <Filter>Source\Public\Core\Asset</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

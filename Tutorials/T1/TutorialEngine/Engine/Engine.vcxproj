@@ -120,7 +120,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;KS_ENGINE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>engine_pch.h</PrecompiledHeaderFile>
@@ -139,7 +139,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;KS_ENGINE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>engine_pch.h</PrecompiledHeaderFile>
@@ -154,6 +154,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source\Core\Application.cpp" />
+    <ClCompile Include="Source\Core\Assets.cpp" />
+    <ClCompile Include="Source\Core\Scene.cpp" />
     <ClCompile Include="Source\Core\Windows\WindowsApplication.cpp" />
     <ClCompile Include="Source\Engine.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
@@ -168,10 +170,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Core\Application.h" />
+    <ClInclude Include="Source\Core\Assets.h" />
     <ClInclude Include="Source\Core\Core.h" />
     <ClInclude Include="Source\Core\CoreMinimal.h" />
     <ClInclude Include="Source\Core\EntryPoint.h" />
+    <ClInclude Include="Source\Core\Json.h" />
+    <ClInclude Include="Source\Core\Math.h" />
+    <ClInclude Include="Source\Core\MeshAsset.h" />
     <ClInclude Include="Source\Core\Platform.h" />
+    <ClInclude Include="Source\Core\Scene.h" />
     <ClInclude Include="Source\Core\Windows\WindowsApplication.h" />
     <ClInclude Include="Source\Core\Windows\WindowsPlatform.h" />
     <ClInclude Include="Source\Engine.h" />
@@ -180,6 +187,9 @@
     <ClInclude Include="Source\RHI\D3D12\D3D12Common.h" />
     <ClInclude Include="Source\RHI\D3D12\D3D12RHI.h" />
     <ClInclude Include="Source\RHI\RHI.h" />
+    <ClInclude Include="Source\ThirdParty\glm\ext.hpp" />
+    <ClInclude Include="Source\ThirdParty\glm\glm.hpp" />
+    <ClInclude Include="Source\ThirdParty\nlohmann\json.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

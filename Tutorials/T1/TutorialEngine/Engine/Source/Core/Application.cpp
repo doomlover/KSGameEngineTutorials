@@ -1,48 +1,52 @@
 #include "engine_pch.h"
 #include "Core/Application.h"
+#include "Engine.h"
 
-using namespace ks;
-
-IApp* GApp = nullptr;
-
-IApp::~IApp()
+namespace ks
 {
-	KS_INFO(TEXT("~IApp"));
+	IApp* GApp = nullptr;
 
-	if (Engine)
+	IApp::~IApp()
 	{
-		delete Engine;
-	}
-}
+		KS_INFO(TEXT("~IApp"));
 
-void IApp::Init()
-{
-	KS_INFO(TEXT("IApp::Init"));
-
-	// IApp暂时负责参数解析
-	std::vector<std::string> Args;
-	std::string ArgsStr = ks::FString::WS2S(GCmdLineArgs);
-	std::istringstream sstream(ArgsStr);
-	std::string tmpstr;
-	while(getline(sstream, tmpstr, ' '))
-	{
-		Args.push_back(tmpstr);
-		KS_INFO(ks::FString::S2WS(tmpstr).c_str());
-		if(tmpstr.find("-gltf=") == 0)
+		if (Engine)
 		{
-			StartMap = ks::FString::S2WS(tmpstr.substr(std::string("-gltf=").length()));
+			delete Engine;
 		}
 	}
-	// ...
 
-	Engine = FEngine::Create();
-	Engine->Init();
-	OnInit();
-}
+	void IApp::Init()
+	{
+		KS_INFO(TEXT("IApp::Init"));
 
-void IApp::Shutdown()
-{
-	KS_INFO(TEXT("IApp::Shutdown"));
-	OnShutdown();
-	Engine->Shutdown();
+		// IApp暂时负责参数解析
+		{
+			std::vector<std::string> Args;
+			std::string ArgsStr = ks::FString::WS2S(GCmdLineArgs);
+			std::istringstream sstream(ArgsStr);
+			std::string tmpstr;
+			while (getline(sstream, tmpstr, ' '))
+			{
+				Args.push_back(tmpstr);
+				KS_INFO(ks::FString::S2WS(tmpstr).c_str());
+				if (tmpstr.find("-map=") == 0)
+				{
+					StartMap = tmpstr.substr(std::string("-map=").length());
+				}
+			}
+		}
+		// ...
+
+		Engine = FEngine::Create();
+		Engine->Init();
+		OnInit();
+	}
+
+	void IApp::Shutdown()
+	{
+		KS_INFO(TEXT("IApp::Shutdown"));
+		OnShutdown();
+		Engine->Shutdown();
+	}
 }

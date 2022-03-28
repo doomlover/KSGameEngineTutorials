@@ -2,19 +2,24 @@
 
 #pragma warning(disable:4251)
 
-#include <codecvt>
-#include <memory>
+#include <algorithm>
 #include <cassert>
-#include <string>
-#include <sstream>
+#include <filesystem>
+#include <fstream>
 #include <iostream>
+#include <sstream>
+#include <memory>
+#include <cstring>
+#include <string>
+#include <unordered_map>
 #include <vector>
+#include <array>
 
 #include "Core/Platform.h"
-#include "RHI/RHI.h"
-#include "Engine.h"
+#include "Core/Math.h"
+#include "Core/Json.h"
 
-using namespace std;
+using json = nlohmann::json;
 
 namespace ks
 {
@@ -45,6 +50,13 @@ namespace ks
 #else
 #error NOT IMPLEMENTED!
 #endif
+		}
+
+		static std::string GetRootPath(const std::string& Path)
+		{
+			size_t RootPos = Path.find_last_of("/");
+			assert(RootPos != std::string::npos);
+			return Path.substr(0, RootPos);
 		}
 	};
 }

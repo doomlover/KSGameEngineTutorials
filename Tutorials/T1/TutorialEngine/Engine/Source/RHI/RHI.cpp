@@ -6,10 +6,10 @@ namespace ks
 {
 	IRHI* GRHI = nullptr;
 
-	IRHI::~IRHI()
+	/*IRHI::~IRHI()
 	{
-		KS_INFO(TEXT("~IRHI\n"));
-	}
+		KS_INFO(TEXT("~IRHI"));
+	}*/
 
 	IRHI* IRHI::Create()
 	{

@@ -2,14 +2,21 @@
 
 namespace ks
 {
+	//class FEngine;
+	class IRHI;
+	class FAssetManager;
+	class FScene;
+
+	extern FEngine* GEngine;
+	extern std::wstring GCmdLineArgs;
+
+	/* see WindowsEntry */
 	namespace engine
 	{
 		void Init();
 		void Tick();
 		void Shutdown();
 	}
-
-	class IRHI;
 
 	class FEngine
 	{
@@ -19,12 +26,12 @@ namespace ks
 		void Init();
 		void Tick();
 		void Shutdown();
-		void LoadMap();
 
 	protected:
-		IRHI* RHI = nullptr;
-	};
+		void LoadScene();
 
-	extern FEngine* GEngine;
-	extern std::wstring GCmdLineArgs;
+		std::unique_ptr<IRHI> RHI;
+		std::unique_ptr<FAssetManager> AssetManager;
+		std::unique_ptr<FScene> Scene;
+	};
 }
