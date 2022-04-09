@@ -575,6 +575,19 @@ namespace
 		D3D12GfxCommandList->IASetVertexBuffers(0, 1, &VertexBuffer->GetVertexBufferView());
 	}
 
+	void FD3D12RHI::SetVertexBuffers(const IRHIVertexBuffer** VertexBuffers, int32 Num)
+	{
+		if (!VertexBuffers || !Num)
+		{
+			return;
+		}
+		for (int32 i{ 0 }; i < Num; ++i)
+		{
+			const FD3D12VertexBuffer* VertexBuffer{ dynamic_cast<const FD3D12VertexBuffer*>(VertexBuffers[i]) };
+			D3D12GfxCommandList->IASetVertexBuffers(i, 1, &VertexBuffer->GetVertexBufferView());
+		}
+	}
+
 	ks::IRHIVertexBuffer* FD3D12RHI::CreateVertexBuffer(uint32 Stride, uint32 Size, const void* Data)
 	{
 		FD3D12VertexBuffer* D3D12VertBuffer = new FD3D12VertexBuffer(Stride, Size);

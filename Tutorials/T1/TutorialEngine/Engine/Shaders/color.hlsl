@@ -1,12 +1,8 @@
-//***************************************************************************************
-// color.hlsl by Frank Luna (C) 2015 All Rights Reserved.
-//
-// Transforms and colors geometry.
-//***************************************************************************************
- 
+
 cbuffer cbPerObject : register(b0)
 {
 	float4x4 gWorld; 
+	float4x4 gWorldInvTrans;
 };
 
 cbuffer cbPass : register(b1)
@@ -17,12 +13,14 @@ cbuffer cbPass : register(b1)
 struct VertexIn
 {
 	float3 PosL  : POSITION;
+	float3 NormL : NORMAL;
 };
 
 struct VertexOut
 {
 	float4 PosH  : SV_POSITION;
-    float4 Color : COLOR;
+	float3 NormW : NORMAL;
+    //float4 Color : COLOR;
 };
 
 VertexOut VS(VertexIn vin)
@@ -33,15 +31,17 @@ VertexOut VS(VertexIn vin)
     float4 posW = mul(float4(vin.PosL, 1.0f), gWorld);
     vout.PosH = mul(posW, gViewProj);
 	
-	// Just pass vertex color into the pixel shader.
-    vout.Color = float4(1.0f, 0.0f, 0.0f, 1.0f);
+	vout.NormW = mul(vin.NormL, (float3x3)gWorldInvTrans);
     
     return vout;
 }
 
 float4 PS(VertexOut pin) : SV_Target
 {
-    return pin.Color;
+	// normalize
+	pin.NormW = normalize(pin.NormW);
+	float4 out_color = pow(float4(pin.NormW * 0.5 + 0.5, 1.0), 1/2.2);
+    return out_color;
 }
 
 

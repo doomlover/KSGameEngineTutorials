@@ -60,6 +60,7 @@ namespace ks::d3d12
 		virtual IRHIPipelineState* CreatePipelineState(const FRHIPipelineStateDesc& Desc) override;
 		virtual void SetShaderConstBuffer(IRHIConstBuffer* ConstBuffer) override;
 		virtual void SetVertexBuffer(const IRHIVertexBuffer* VertexBuffer) override;
+		virtual void SetVertexBuffers(const IRHIVertexBuffer** VertexBuffers, int32 Num) override;
 		virtual IRHIVertexBuffer* CreateVertexBuffer(uint32 Stride, uint32 Size, const void* Data) override;
 		virtual IRHIIndexBuffer* CreateIndexBuffer(EELEM_FORMAT ElemFormat, uint32 Stride, uint32 Size, const void* Data) override;
 		virtual void DrawIndexedPrimitive(const IRHIIndexBuffer* IndexBuffer) override;

@@ -14,6 +14,8 @@ namespace ks
 		FPrimitiveConstBufferParameter ConstBufferParameter;
 		ConstBufferParameter.WorldTrans = MeshComponent->GetWorldTrans();
 		ConstBufferParameter.WorldTrans = glm::transpose(ConstBufferParameter.WorldTrans);
+		ConstBufferParameter.InvTransposeWorldTrans = glm::inverse(ConstBufferParameter.WorldTrans);
+
 		PrimitiveConstBuffer = std::shared_ptr<TConstBuffer<FPrimitiveConstBufferParameter>>(
 			TConstBuffer<FPrimitiveConstBufferParameter>::CreateConstBuffer(ConstBufferParameter));
 		PrimitiveConstBuffer->GetRHIConstBuffer()->SetLocationIndex(0);

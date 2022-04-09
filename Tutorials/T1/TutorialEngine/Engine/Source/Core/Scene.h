@@ -40,7 +40,7 @@ namespace ks
 			FOrthographicCamera OrthCamera;
 			FPerspectiveCamera PersCamera;
 		};
-		FCameraData CameraData;
+		FCameraData CameraData{};
 	};
 
 	struct FSceneNodeInfo

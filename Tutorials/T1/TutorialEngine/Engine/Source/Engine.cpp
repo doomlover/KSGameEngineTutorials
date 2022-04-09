@@ -118,13 +118,15 @@ namespace ks
 		}
 	}
 
+namespace util
+{
 	EELEM_FORMAT GetElemFormat(EDATA_TYPE DataType, EELEM_TYPE ElemType)
 	{
-		switch(DataType)
+		switch (DataType)
 		{
 		case EDATA_TYPE::BYTE:
 		{
-			switch(ElemType)
+			switch (ElemType)
 			{
 			case EELEM_TYPE::SCALAR:
 				return EELEM_FORMAT::R8_INT;
@@ -132,14 +134,14 @@ namespace ks
 		}
 		case EDATA_TYPE::UNSIGNED_BYTE:
 		{
-			switch(ElemType)
+			switch (ElemType)
 			{
 			case EELEM_TYPE::SCALAR:
 				return EELEM_FORMAT::R8_UINT;
 			}
 		}
 		case EDATA_TYPE::SHORT:
-			switch(ElemType)
+			switch (ElemType)
 			{
 			case EELEM_TYPE::SCALAR:
 				return EELEM_FORMAT::R16_INT;
@@ -157,7 +159,7 @@ namespace ks
 		return EELEM_FORMAT::INVALID;
 	}
 
-	uint32 GetDataTypeSize(EDATA_TYPE DataType)
+	size_t GetDataTypeSize(EDATA_TYPE DataType)
 	{
 		switch (DataType)
 		{
@@ -178,6 +180,31 @@ namespace ks
 		return 0;
 	}
 
+	uint32 GetElemNum(EELEM_TYPE ElemType)
+	{
+		switch (ElemType)
+		{
+		case EELEM_TYPE::SCALAR:
+			return 1;
+		case EELEM_TYPE::VEC2:
+			return 2;
+		case EELEM_TYPE::VEC3:
+			return 3;
+		case EELEM_TYPE::VEC4:
+			return 4;
+		case EELEM_TYPE::MAT2:
+			return 4;
+		case EELEM_TYPE::MAT3:
+			return 9;
+		case EELEM_TYPE::MAT4:
+			return 16;
+		default:
+			assert(false);
+			break;
+		}
+		return 0;
+	}
+
 	std::string GetContentPath(const std::string& Path)
 	{
 		return "./Content" + Path;
@@ -187,6 +214,7 @@ namespace ks
 	{
 		return "./Shaders/" + Path;
 	}
+}
 }
 
 

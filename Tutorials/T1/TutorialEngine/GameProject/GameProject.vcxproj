@@ -76,8 +76,7 @@
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>xcopy $(SolutionDir)Engine\Shaders $(SolutionDir)Binaries\Shaders\ /E/H/Y
-xcopy $(ProjectDir)Content $(SolutionDir)Binaries\Content\ /E/H/Y</Command>
+      <Command>xcopy $(ProjectDir)Content $(SolutionDir)Binaries\Content\ /E/H/Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -107,8 +106,7 @@ xcopy $(ProjectDir)Content $(SolutionDir)Binaries\Content\ /E/H/Y</Command>
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>xcopy $(SolutionDir)Engine\Shaders $(SolutionDir)Binaries\Shaders\ /E/H/Y
-xcopy $(ProjectDir)Content $(SolutionDir)Binaries\Content\ /E/H/Y</Command>
+      <Command>xcopy $(ProjectDir)Content $(SolutionDir)Binaries\Content\ /E/H/Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

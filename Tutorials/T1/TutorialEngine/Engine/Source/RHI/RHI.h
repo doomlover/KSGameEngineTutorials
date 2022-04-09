@@ -28,6 +28,7 @@ namespace ks
 		virtual IRHIPipelineState* CreatePipelineState(const FRHIPipelineStateDesc& Desc) = 0;
 		virtual void SetShaderConstBuffer(IRHIConstBuffer* ConstBuffer) = 0;
 		virtual void SetVertexBuffer(const IRHIVertexBuffer* VertexBuffer) = 0;
+		virtual void SetVertexBuffers(const IRHIVertexBuffer** VertexBuffers, int32 Num) = 0;
 		virtual IRHIVertexBuffer* CreateVertexBuffer(uint32 Stride, uint32 Size, const void* Data) = 0;
 		virtual IRHIIndexBuffer* CreateIndexBuffer(EELEM_FORMAT ElemFormat, uint32 Stride, uint32 Size, const void* Data) = 0;
 		virtual void DrawIndexedPrimitive(const IRHIIndexBuffer* IndexBuffer) = 0;

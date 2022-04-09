@@ -72,7 +72,7 @@ namespace
 
 	void BuildShaders(std::unordered_map<std::string, ComPtr<ID3DBlob>>& Shaders)
 	{
-		std::wstring ShaderPath{FString::S2WS(::ks::GetShaderPath("color.hlsl"))};
+		std::wstring ShaderPath{FString::S2WS(util::GetShaderPath("color.hlsl"))};
 		Shaders["standardVS"] = CompileShader(ShaderPath, nullptr, "VS", "vs_5_1");
 		Shaders["opaquePS"] = CompileShader(ShaderPath, nullptr, "PS", "ps_5_1");
 	}
@@ -84,7 +84,7 @@ namespace
 		std::vector<D3D12_INPUT_ELEMENT_DESC> InputLayout =
 		{
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-			//{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+			{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 		};
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC D3D12Desc;
 		ZeroMemory(&D3D12Desc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
@@ -106,7 +106,8 @@ namespace
 			Shaders["opaquePS"]->GetBufferSize()
 		};
 		D3D12Desc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-		D3D12Desc.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
+		//D3D12Desc.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
+		D3D12Desc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
 		D3D12Desc.RasterizerState.FrontCounterClockwise = TRUE;
 		D3D12Desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 		D3D12Desc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);

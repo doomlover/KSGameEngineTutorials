@@ -61,13 +61,22 @@ namespace ks
 		INVALID,
 	};
 
+namespace util
+{
 	EELEM_FORMAT GetElemFormat(EDATA_TYPE DataType, EELEM_TYPE ElemType);
 
-	uint32 GetDataTypeSize(EDATA_TYPE DataType);
+	size_t GetDataTypeSize(EDATA_TYPE DataType);
+
+	uint32 GetElemNum(EELEM_TYPE ElemType);
+
+	inline size_t GetStride(const EELEM_TYPE& ElemType, const EDATA_TYPE& DataType) {
+		return GetElemNum(ElemType) * GetDataTypeSize(DataType);
+	}
 
 	std::string GetContentPath(const std::string& Path);
 
 	std::string GetShaderPath(const std::string& Path);
+}
 
 	class KS_API FString
 	{

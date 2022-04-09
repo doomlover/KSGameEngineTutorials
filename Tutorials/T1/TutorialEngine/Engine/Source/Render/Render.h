@@ -18,6 +18,7 @@ namespace ks
 	struct FPrimitiveConstBufferParameter
 	{
 		glm::mat4 WorldTrans{};
+		glm::mat4 InvTransposeWorldTrans{};
 	};
 
 	class FRenderPrimitive

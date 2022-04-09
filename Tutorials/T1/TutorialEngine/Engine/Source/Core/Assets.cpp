@@ -6,6 +6,17 @@
 namespace ks {
 
 	namespace gltf {
+		struct FRawAttributeData
+		{
+			std::string Name;
+			EELEM_TYPE ElemType{ EELEM_TYPE::INVALID };
+			EDATA_TYPE DataType{ EDATA_TYPE::INVALID };
+			uint32 Count{ 0 };
+			std::vector<uint8> Data;
+			size_t GetStride() const {
+				return util::GetStride(ElemType, DataType);
+			}
+		};
 		namespace {
 			/* load bin file to the RawData */
 			int LoadBuffer(const FScene& Scene, FBuffer& Buffer);
@@ -61,6 +72,34 @@ namespace ks {
 					Type = ECameraType::ORTHOGRAPHIC;
 				}
 				return Type;
+			}
+
+			void CopyRawData(const FScene& Scene, const FAccessor& Accessor, std::vector<uint8>& RawData)
+			{
+				const gltf::FBufferView& BufferView = Scene.bufferViews.at(Accessor.bufferView);
+				// get copy start point
+				const gltf::FBuffer& Buffer = Scene.buffers.at(BufferView.buffer);
+				const auto SrcPoint = Buffer.RawData.data() + BufferView.byteOffset;
+
+				// get copy length
+				const int32& SrcLength{ BufferView.byteLength };
+
+				// copy to raw data
+				RawData.resize(SrcLength);
+				auto DestPoint = RawData.data();
+				size_t DestSize = RawData.size() * sizeof(uint8);
+				assert(DestSize == SrcLength);
+
+				bool error = memcpy_s(DestPoint, DestSize, SrcPoint, SrcLength);
+				assert(!error);
+			}
+
+			void CopyRawDataByAccessor(FRawAttributeData& AttributeData, const FScene& Scene, int32 AccessorIndex) {
+				auto Accessor = GetAccessor(Scene, AccessorIndex);
+				AttributeData.ElemType = GetElemType(Accessor.type);
+				AttributeData.DataType = static_cast<EDATA_TYPE>(Accessor.componentType);
+				AttributeData.Count = Accessor.count;
+				CopyRawData(Scene, Accessor, AttributeData.Data);
 			}
 		}
 	}
@@ -131,7 +170,7 @@ namespace ks {
 	void FSceneAsset::LoadGLTF()
 	{
 		// open file stream
-		std::string FilePath = ::ks::GetContentPath(Path);
+		std::string FilePath = util::GetContentPath(Path);
 		std::ifstream InStream(FilePath);
 		assert(InStream.is_open());
 
@@ -246,7 +285,7 @@ namespace ks {
 
 			int LoadBuffer(const FScene& Scene, FBuffer& Buffer)
 			{
-				std::string FilePath = ::ks::GetContentPath(Scene.root + "/" + Buffer.uri);
+				std::string FilePath = util::GetContentPath(Scene.root + "/" + Buffer.uri);
 				assert(Buffer.byteLength == std::filesystem::file_size(FilePath));
 
 				std::ifstream BufferFileStream{ FilePath, std::ios::in | std::ios::binary };
@@ -262,26 +301,6 @@ namespace ks {
 				}
 
 				return -1;
-			}
-
-			void CopyRawData(const FScene& Scene, const FAccessor& Accessor, std::vector<uint8>& RawData)
-			{
-				const gltf::FBufferView& BufferView = Scene.bufferViews.at(Accessor.bufferView);
-				// get copy start point
-				const gltf::FBuffer& Buffer = Scene.buffers.at(BufferView.buffer);
-				const auto SrcPoint = Buffer.RawData.data() + BufferView.byteOffset;
-
-				// get copy length
-				const int32& SrcLength{ BufferView.byteLength };
-
-				// copy to raw data
-				RawData.resize(SrcLength);
-				auto DestPoint = RawData.data();
-				size_t DestSize = RawData.size() * sizeof(uint8);
-				assert(DestSize == SrcLength);
-				
-				bool error = memcpy_s(DestPoint, DestSize, SrcPoint, SrcLength);
-				assert(!error);
 			}
 
 			void LoadMeshData(const FScene& Scene, const FMesh& Mesh, FMeshData& MeshData)
@@ -312,14 +331,54 @@ namespace ks {
 						memcpy(IndexRawData.data(), RawData.data(), sizeof(uint16) * RawData.size());
 					}
 				}
-				// load vertex buffer
+				// load position buffer
 				{
-					const auto& Accessor = gltf::GetAccessor(Scene, Primitive.attributes.at("POSITION"));
-					MeshData.PositionDataType = static_cast<EDATA_TYPE>(Accessor.componentType);
-					assert(MeshData.PositionDataType == EDATA_TYPE::FLOAT);
-					MeshData.PositionElemType = gltf::GetElemType(Accessor.type);
-					assert(MeshData.PositionElemType == EELEM_TYPE::VEC3);
-					gltf::CopyRawData(Scene, Accessor, MeshData.PositionRawData);
+					FRawAttributeData MeshPositionData;
+					MeshPositionData.Name = std::move(std::string("POSITION"));
+					gltf::CopyRawDataByAccessor(MeshPositionData, Scene, Primitive.attributes.at(MeshPositionData.Name));
+					MeshData.PositionData.Count = MeshPositionData.Count;
+					MeshData.PositionData.Stride = static_cast<uint32>(MeshPositionData.GetStride());
+					MeshData.PositionData.Data = std::move(MeshPositionData.Data);
+				}
+				// load all other vertex attributes
+				{
+					std::vector<std::string> AttributeNames = {"NORMAL", "TEXCOORD_0"};
+					std::vector<FRawAttributeData> AttriDataAry;
+					for (const auto& AttributeName : AttributeNames)
+					{
+						AttriDataAry.push_back(FRawAttributeData());
+						AttriDataAry.back().Name = AttributeName;
+						gltf::CopyRawDataByAccessor(AttriDataAry.back(), Scene, Primitive.attributes.at(AttributeName));
+					}
+					
+					// merge all vertex attributes into a single attribute buffer
+					size_t ByteSize{0};
+					size_t Stride{0};
+					const uint32 ElemCount{ AttriDataAry.begin()->Count };
+					for (const auto& AttriData : AttriDataAry)
+					{
+						ByteSize += AttriData.Data.size();
+						Stride += util::GetStride(AttriData.ElemType, AttriData.DataType);
+						assert(ElemCount == AttriData.Count);
+					}
+					assert(ElemCount * Stride == ByteSize);
+					std::vector<uint8> Data(ByteSize);
+					uint8* pData{Data.data()};
+					size_t ByteOffset{0};
+					for (const auto& AttriData : AttriDataAry)
+					{
+						size_t AttriStride = util::GetStride(AttriData.ElemType, AttriData.DataType);
+						const uint8* pAttriData{AttriData.Data.data()};
+						for (uint32 i{0}; i < ElemCount; ++i)
+						{
+							memcpy(pData + ByteOffset + Stride * i, pAttriData + AttriStride * i, AttriStride);
+						}
+						ByteOffset += AttriStride;
+					}
+
+					MeshData.AttributeData.Count = ElemCount;
+					MeshData.AttributeData.Stride = static_cast<uint32>(Stride);
+					MeshData.AttributeData.Data = std::move(Data);
 				}
 			}
 

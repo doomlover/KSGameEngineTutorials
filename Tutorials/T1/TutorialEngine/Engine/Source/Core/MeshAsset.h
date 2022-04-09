@@ -6,31 +6,45 @@
 
 namespace ks {
 
+	struct FMeshAttributeData
+	{
+		uint32 Count{0};
+		uint32 Stride{0};
+		std::vector<uint8> Data;
+		FMeshAttributeData() = default;
+		FMeshAttributeData(FMeshAttributeData&& Tmp) noexcept {
+			*this = std::move(Tmp);
+		}
+		FMeshAttributeData& operator=(FMeshAttributeData&& Tmp) noexcept {
+			Count = Tmp.Count;
+			Stride = Tmp.Stride;
+			Data = std::move(Tmp.Data);
+			return *this;
+		}
+	};
+
 	struct FMeshData
 	{
 		// root/name
 		std::string KeyName;
 		// indices
-		EDATA_TYPE IndexDataType = EDATA_TYPE::INVALID;
+		EDATA_TYPE IndexDataType{EDATA_TYPE::INVALID};
 		std::vector<uint8> IndexRawData;
 		// positions
-		EELEM_TYPE PositionElemType = EELEM_TYPE::INVALID;
-		EDATA_TYPE PositionDataType = EDATA_TYPE::INVALID;
-		std::vector<uint8> PositionRawData;
+		FMeshAttributeData PositionData;
+		// other attributes include normal, texcoord, etc
+		FMeshAttributeData AttributeData;
 
 		FMeshData() = default;
-		FMeshData(FMeshData&& TempMeshData) noexcept
-		{
+		FMeshData(FMeshData&& TempMeshData) noexcept {
 			*this = std::move(TempMeshData);
 		}
-		FMeshData& operator=(FMeshData&& TempMeshData) noexcept
-		{
-			KeyName = std::move(TempMeshData.KeyName);
-			IndexDataType = TempMeshData.IndexDataType;
-			IndexRawData = std::move(TempMeshData.IndexRawData);
-			PositionElemType = TempMeshData.PositionElemType;
-			PositionDataType = TempMeshData.PositionDataType;
-			PositionRawData = std::move(TempMeshData.PositionRawData);
+		FMeshData& operator=(FMeshData&& Tmp) noexcept {
+			KeyName = std::move(Tmp.KeyName);
+			IndexDataType = Tmp.IndexDataType;
+			IndexRawData = std::move(Tmp.IndexRawData);
+			PositionData = std::move(Tmp.PositionData);
+			AttributeData = std::move(Tmp.AttributeData);
 			return *this;
 		}
 	};

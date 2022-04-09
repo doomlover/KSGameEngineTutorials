@@ -32,8 +32,8 @@ namespace ks
 
 			// set vertex input
 			const FMeshRenderData* MeshRenderData{ Prim->GetRenderData() };
-			const IRHIVertexBuffer* VertexBuffer{ MeshRenderData->GetRHIVertexBuffer() };
-			GRHI->SetVertexBuffer(VertexBuffer);
+			const IRHIVertexBuffer* VertexBuffers[] = {MeshRenderData->GetRHIVertexBuffer(), MeshRenderData->GetRHIAttrBuffer()};
+			GRHI->SetVertexBuffers(VertexBuffers, _countof(VertexBuffers));
 
 			// set index buffer and draw primitives
 			const IRHIIndexBuffer* IndexBuffer{ MeshRenderData->GetRHIIndexBuffer() };
