@@ -18,13 +18,29 @@ namespace ks
 		for (auto& SceneNodeInfo : SceneNodeInfos)
 		{
 			SceneNodes.push_back(std::make_unique<FSceneNode>(SceneNodeInfo));
-
-			if (SceneNodeInfo.Camera.Type != ECameraType::INVALID)
+			auto& SceneNode{SceneNodes.back()};
+			// get camera node
+			if (SceneNode->CameraComponent)
 			{
-				Camera = SceneNodes.back().get();
+				Camera = SceneNode.get();
 			}
-
-			SceneNodeMap.insert({SceneNodeInfo.id, SceneNodes.back().get()});
+			// get directional light node
+			else if (SceneNode->LightComponent)
+			{
+				auto& LightComponent{SceneNode->LightComponent};
+				ELightType LightType{LightComponent->GetType()};
+				switch (LightType)
+				{
+				case ELightType::DIRECTIONAL:
+					DirectionalLight = SceneNode.get();
+					break;
+				default:
+					assert(false);
+					break;
+				}
+			}
+			// insert to map
+			SceneNodeMap.insert({SceneNodeInfo.id, SceneNode.get()});
 		}
 		// setup parent and children links
 		for (auto& SceneNodeInfo : SceneNodeInfos)
@@ -36,7 +52,7 @@ namespace ks
 				pParent->AddChild(pChild);
 			}
 		}
-
+		
 		// rendering, create render scene
 		RenderScene = FRenderer::CreateRenderScene(this);
 
@@ -62,10 +78,13 @@ namespace ks
 			std::shared_ptr<IAsset> Asset = GAssetManager->GetAsset(NodeInfo.MeshAssetKeyName);
 			StaticMeshComponent->SetStaticMesh(std::dynamic_pointer_cast<FStaticMeshAsset>(Asset));
 		}
-
 		if (NodeInfo.Camera.Type != ECameraType::INVALID)
 		{
 			CameraComponent = std::make_unique<FCameraComponent>(NodeInfo.Camera);
+		}
+		if (NodeInfo.Light.Type != ELightType::INVALID)
+		{
+			LightComponent = std::make_unique<FLightComponent>(NodeInfo.Light, this);
 		}
 	}
 

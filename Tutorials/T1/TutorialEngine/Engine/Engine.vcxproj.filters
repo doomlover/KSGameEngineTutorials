@@ -103,6 +103,7 @@
     <ClCompile Include="Source\RHI\D3D12\D3D12PipelineState.cpp">
       <Filter>Source\Private\RHI\D3D12</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Core\Component\LightComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\engine_pch.h">
@@ -183,5 +184,7 @@
     <ClInclude Include="Source\RHI\RHIPipelineStateDesc.h">
       <Filter>Source\Public\RHI</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Core\Component\Component.h" />
+    <ClInclude Include="Source\Core\Component\LightComponent.h" />
   </ItemGroup>
 </Project>

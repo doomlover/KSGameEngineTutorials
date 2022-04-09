@@ -13,8 +13,8 @@ namespace ks
 	{
 		FPrimitiveConstBufferParameter ConstBufferParameter;
 		ConstBufferParameter.WorldTrans = MeshComponent->GetWorldTrans();
+		ConstBufferParameter.InvTWorldTrans = glm::inverse(ConstBufferParameter.WorldTrans);
 		ConstBufferParameter.WorldTrans = glm::transpose(ConstBufferParameter.WorldTrans);
-		ConstBufferParameter.InvTransposeWorldTrans = glm::inverse(ConstBufferParameter.WorldTrans);
 
 		PrimitiveConstBuffer = std::shared_ptr<TConstBuffer<FPrimitiveConstBufferParameter>>(
 			TConstBuffer<FPrimitiveConstBufferParameter>::CreateConstBuffer(ConstBufferParameter));
@@ -28,10 +28,14 @@ namespace ks
 	{
 		// base pass const buffer
 		FViewConstBufferParameter ViewConstBufferParm;
+		// view projection matrix
 		glm::mat4 view_mat{ Scene->GetViewTrans() };
-		glm::mat4 proj_mat{Scene->GetProjectionTrans()};
+		glm::mat4 proj_mat{ Scene->GetProjectionTrans() };
 		ViewConstBufferParm.ViewProjectionTrans = proj_mat * view_mat;
 		ViewConstBufferParm.ViewProjectionTrans = glm::transpose(ViewConstBufferParm.ViewProjectionTrans);
+		// directional light direction and intensity
+		Scene->GetDirectionalLight(ViewConstBufferParm.DirectionalLight, ViewConstBufferParm.DirectionalLightIntensity);
+
 		BasePassConstBuffer = std::shared_ptr<TConstBuffer<FViewConstBufferParameter>>(
 			TConstBuffer<FViewConstBufferParameter>::CreateConstBuffer(ViewConstBufferParm));
 		BasePassConstBuffer->GetRHIConstBuffer()->SetLocationIndex(1);

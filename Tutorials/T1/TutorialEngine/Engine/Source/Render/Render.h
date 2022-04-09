@@ -12,13 +12,15 @@ namespace ks
 
 	struct FViewConstBufferParameter
 	{
-		glm::mat4 ViewProjectionTrans{};
+		glm::mat4 ViewProjectionTrans;
+		glm::vec3 DirectionalLight;
+		float DirectionalLightIntensity{0.f};
 	};
 
 	struct FPrimitiveConstBufferParameter
 	{
-		glm::mat4 WorldTrans{};
-		glm::mat4 InvTransposeWorldTrans{};
+		glm::mat4 WorldTrans;
+		glm::mat4 InvTWorldTrans;
 	};
 
 	class FRenderPrimitive

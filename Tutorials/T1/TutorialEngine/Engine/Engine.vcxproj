@@ -179,6 +179,7 @@
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Core\Component\LightComponent.cpp" />
     <ClCompile Include="Source\RHI\D3D12\D3D12PipelineState.cpp" />
     <ClCompile Include="Source\Render\RenderPass.cpp" />
     <ClCompile Include="Source\Core\Application.cpp" />
@@ -200,6 +201,8 @@
     <ClCompile Include="Source\RHI\RHI.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Core\Component\Component.h" />
+    <ClInclude Include="Source\Core\Component\LightComponent.h" />
     <ClInclude Include="Source\RHI\D3D12\D3D12PipelineState.h" />
     <ClInclude Include="Source\Render\RenderPass.h" />
     <ClInclude Include="Source\Core\Application.h" />

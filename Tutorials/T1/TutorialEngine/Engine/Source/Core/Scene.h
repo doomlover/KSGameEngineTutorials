@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/Math.h"
+#include "Component/LightComponent.h"
 
 namespace ks
 {
@@ -53,6 +54,7 @@ namespace ks
 		glm::vec3 Scale;
 		std::string MeshAssetKeyName;
 		FCameraInfo Camera;
+		FLightInfo Light;
 	};
 
 	struct FSceneNode
@@ -63,26 +65,31 @@ namespace ks
 			return StaticMeshComponent.get();
 		}
 		void AddChild(FSceneNode* Child) {
-			assert(Child);
-			assert(!Child->Parent);
+			assert(Child && !Child->Parent);
 			Child->Parent = this;
 			Children.push_back(Child);
 		}
 		glm::mat4 GetWorldTrans() const {
-
 			glm::mat4 ParentWorldTrans = Parent
 				? Parent->GetWorldTrans()
-				: glm::mat4(1.0);
+				: glm::mat4{1.0f};
 			return ParentWorldTrans * GetLocalTrans();
 		}
 		glm::mat4 GetLocalTrans() const {
-			glm::mat4 LocalTrans(1.0);
+			glm::mat4 LocalTrans{1.0f};
 			LocalTrans = glm::scale(LocalTrans, Scale);
 			LocalTrans = glm::mat4_cast(Rotation) * LocalTrans;
-			//LocalTrans = glm::translate(LocalTrans, Translate);
 			LocalTrans[3] = glm::vec4(Translate, 1.0f);
+			/*
+			When using glm::translate( X, vec3 ), you are multiplying
+            X * glm::translate( Identity, vec3 )
+			This means translate first, then X
+			so if we want scale first, then rot, then trans, we need the following
+			glm::mat4 lt = glm::translate(glm::mat4{ 1.0f }, Translate);
+			lt = lt * glm::mat4_cast(Rotation);
+			lt = glm::scale(lt, Scale);
+			*/
 			return LocalTrans;
-			
 		}
 		std::string Name;
 		// transform
@@ -93,6 +100,8 @@ namespace ks
 		std::unique_ptr<FStaticMeshComponent> StaticMeshComponent;
 		// camera component
 		std::unique_ptr<FCameraComponent> CameraComponent;
+		// light component
+		std::unique_ptr<FLightComponent> LightComponent;
 		// tree info
 		FSceneNode* Parent{ nullptr };
 		std::vector<FSceneNode*> Children;
@@ -136,8 +145,13 @@ namespace ks
 		glm::mat4 GetProjectionTrans() {
 			return Camera->CameraComponent->GetProjectionTrans();
 		}
+		void GetDirectionalLight(glm::vec3& Direction, float& Intensity) {
+			Direction = DirectionalLight ? DirectionalLight->LightComponent->GetDirection() : glm::vec3(0, 1, 0);
+			Intensity = DirectionalLight ? DirectionalLight->LightComponent->GetIntensity() : 0.f;
+		}
 	private:
 		FSceneNode* Camera{nullptr};
+		FSceneNode* DirectionalLight{nullptr};
 		// ref the scene asset
 		std::shared_ptr<FSceneAsset> SceneAsset;
 		// contain all the scene nodes

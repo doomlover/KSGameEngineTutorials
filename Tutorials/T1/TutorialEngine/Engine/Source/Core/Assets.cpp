@@ -180,7 +180,6 @@ namespace ks {
 		GltfScene = GLTFLevelJson.get<gltf::FScene>();
 		GltfScene.root = FString::GetRootPath(Path);
 		gltf::SetNodeParent(GltfScene);
-		//GltfScene.PrintToLog();
 
 		// load contained assets
 		LoadContainedAssets();
@@ -244,6 +243,13 @@ namespace ks {
 				};
 				break;
 			}
+		}
+
+		if (GLTF_NodeInfo.light != -1)
+		{
+			const gltf::FKHRLightsPunctual::FLight& GLTF_Light{ GltfScene.extensions.KHR_lights_punctual.lights.at(GLTF_NodeInfo.light) };
+			NodeInfo.Light.Intensity = GLTF_Light.intensity;
+			NodeInfo.Light.Type = util::GetLightType(GLTF_Light.type);
 		}
 	}
 

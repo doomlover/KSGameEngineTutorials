@@ -1,13 +1,15 @@
 
-cbuffer cbPerObject : register(b0)
+cbuffer PrimitiveConstBuffer : register(b0)
 {
 	float4x4 gWorld; 
 	float4x4 gWorldInvTrans;
 };
 
-cbuffer cbPass : register(b1)
+cbuffer PassConstBuffer : register(b1)
 {
-	float4x4 gViewProj;
+	float4x4 view_proj_mat;
+	float3 directional_light_dir;
+	float directional_light_intensity;
 };
 
 struct VertexIn
@@ -19,8 +21,7 @@ struct VertexIn
 struct VertexOut
 {
 	float4 PosH  : SV_POSITION;
-	float3 NormW : NORMAL;
-    //float4 Color : COLOR;
+	float3 norm_w : NORMAL;
 };
 
 VertexOut VS(VertexIn vin)
@@ -29,9 +30,9 @@ VertexOut VS(VertexIn vin)
 	
 	// Transform to homogeneous clip space.
     float4 posW = mul(float4(vin.PosL, 1.0f), gWorld);
-    vout.PosH = mul(posW, gViewProj);
+    vout.PosH = mul(posW, view_proj_mat);
 	
-	vout.NormW = mul(vin.NormL, (float3x3)gWorldInvTrans);
+	vout.norm_w = mul(vin.NormL, (float3x3)gWorldInvTrans);
     
     return vout;
 }
@@ -39,9 +40,10 @@ VertexOut VS(VertexIn vin)
 float4 PS(VertexOut pin) : SV_Target
 {
 	// normalize
-	pin.NormW = normalize(pin.NormW);
-	float4 out_color = pow(float4(pin.NormW * 0.5 + 0.5, 1.0), 1/2.2);
-    return out_color;
+	float3 normal = normalize(pin.norm_w);
+	float n_dot_l = max(dot(directional_light_dir, normal), 0.0f);
+	float3 out_color = float3(1.0f, 1.0f, 1.0f) * n_dot_l * directional_light_intensity;
+    return float4(out_color, 1.0f);
 }
 
 
