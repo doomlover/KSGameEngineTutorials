@@ -1,7 +1,8 @@
 #include "engine_pch.h"
 #include "Core/Scene.h"
-#include "Core/Assets.h"
-#include "Core/MeshAsset.h"
+#include "Core/Asset/Assets.h"
+#include "Core/Asset/MeshAsset.h"
+#include "Core/Asset/AssetManager.h"
 #include "Render/Render.h"
 #include "Core/Application.h"
 

@@ -3,7 +3,8 @@
 #include "Render/MeshRenderData.h"
 #include "Render/RenderPass.h"
 #include "Core/Scene.h"
-#include "Core/MeshAsset.h"
+#include "Core/Asset/MeshAsset.h"
+#include "Core/Asset/MaterialAsset.h"
 #include "RHI/RHI.h"
 
 namespace ks
@@ -13,8 +14,17 @@ namespace ks
 	{
 		FPrimitiveConstBufferParameter ConstBufferParameter;
 		ConstBufferParameter.WorldTrans = MeshComponent->GetWorldTrans();
-		ConstBufferParameter.InvTWorldTrans = glm::inverse(ConstBufferParameter.WorldTrans);
+		ConstBufferParameter.InvTranspWorldTrans = glm::affineInverse(ConstBufferParameter.WorldTrans);
 		ConstBufferParameter.WorldTrans = glm::transpose(ConstBufferParameter.WorldTrans);
+
+		FMaterialAsset* MaterialAsset{ MeshComponent->GetStaticMesh()->GetMaterialAsset() };
+		if (MaterialAsset)
+		{
+			const FMaterialData& MaterialData{ MaterialAsset->GetMaterialData() };
+			memcpy(&ConstBufferParameter.BaseColorFactor, &MaterialData.BaseColorFactor[0], sizeof(float) * _countof(MaterialData.BaseColorFactor));
+			ConstBufferParameter.RoughnessMetallicFactor.x = MaterialData.RoughnessFactor;
+			ConstBufferParameter.RoughnessMetallicFactor.y = MaterialData.MetallicFactor;
+		}
 
 		PrimitiveConstBuffer = std::shared_ptr<TConstBuffer<FPrimitiveConstBufferParameter>>(
 			TConstBuffer<FPrimitiveConstBufferParameter>::CreateConstBuffer(ConstBufferParameter));
@@ -31,10 +41,17 @@ namespace ks
 		// view projection matrix
 		glm::mat4 view_mat{ Scene->GetViewTrans() };
 		glm::mat4 proj_mat{ Scene->GetProjectionTrans() };
-		ViewConstBufferParm.ViewProjectionTrans = proj_mat * view_mat;
-		ViewConstBufferParm.ViewProjectionTrans = glm::transpose(ViewConstBufferParm.ViewProjectionTrans);
+		ViewConstBufferParm.ViewProjTrans = proj_mat * view_mat;
+		ViewConstBufferParm.ViewProjTrans = glm::transpose(ViewConstBufferParm.ViewProjTrans);
 		// directional light direction and intensity
-		Scene->GetDirectionalLight(ViewConstBufferParm.DirectionalLight, ViewConstBufferParm.DirectionalLightIntensity);
+		glm::vec3 LightDir;
+		float LightIns;
+		Scene->GetDirectionalLight(LightDir, LightIns);
+		ViewConstBufferParm.D_LightDirectionAndInstensity = glm::vec4(LightDir, LightIns);
+		// get look direction
+		FSceneNode* Camera{Scene->GetCamera()};
+		glm::mat4 Eye2World{Camera->GetWorldTrans()};
+		ViewConstBufferParm.EyePos = Eye2World[3];
 
 		BasePassConstBuffer = std::shared_ptr<TConstBuffer<FViewConstBufferParameter>>(
 			TConstBuffer<FViewConstBufferParameter>::CreateConstBuffer(ViewConstBufferParm));

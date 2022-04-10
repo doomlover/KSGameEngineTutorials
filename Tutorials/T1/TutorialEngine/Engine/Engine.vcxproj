@@ -179,12 +179,14 @@
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Core\Asset\AssetManager.cpp" />
+    <ClCompile Include="Source\Core\Asset\MaterialAsset.cpp" />
     <ClCompile Include="Source\Core\Component\LightComponent.cpp" />
     <ClCompile Include="Source\RHI\D3D12\D3D12PipelineState.cpp" />
     <ClCompile Include="Source\Render\RenderPass.cpp" />
     <ClCompile Include="Source\Core\Application.cpp" />
-    <ClCompile Include="Source\Core\Assets.cpp" />
-    <ClCompile Include="Source\Core\MeshAsset.cpp" />
+    <ClCompile Include="Source\Core\Asset\Assets.cpp" />
+    <ClCompile Include="Source\Core\Asset\MeshAsset.cpp" />
     <ClCompile Include="Source\Core\Scene.cpp" />
     <ClCompile Include="Source\Core\Windows\WindowsApplication.cpp" />
     <ClCompile Include="Source\Engine.cpp">
@@ -201,18 +203,21 @@
     <ClCompile Include="Source\RHI\RHI.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Core\Asset\AssetManager.h" />
+    <ClInclude Include="Source\Core\Asset\MaterialAsset.h" />
+    <ClInclude Include="Source\Core\Asset\MaterialData.h" />
     <ClInclude Include="Source\Core\Component\Component.h" />
     <ClInclude Include="Source\Core\Component\LightComponent.h" />
     <ClInclude Include="Source\RHI\D3D12\D3D12PipelineState.h" />
     <ClInclude Include="Source\Render\RenderPass.h" />
     <ClInclude Include="Source\Core\Application.h" />
-    <ClInclude Include="Source\Core\Assets.h" />
+    <ClInclude Include="Source\Core\Asset\Assets.h" />
     <ClInclude Include="Source\Core\Core.h" />
     <ClInclude Include="Source\Core\CoreMinimal.h" />
     <ClInclude Include="Source\Core\EntryPoint.h" />
     <ClInclude Include="Source\Core\Json.h" />
     <ClInclude Include="Source\Core\Math.h" />
-    <ClInclude Include="Source\Core\MeshAsset.h" />
+    <ClInclude Include="Source\Core\Asset\MeshAsset.h" />
     <ClInclude Include="Source\Core\Platform.h" />
     <ClInclude Include="Source\Core\Scene.h" />
     <ClInclude Include="Source\Core\Windows\WindowsApplication.h" />

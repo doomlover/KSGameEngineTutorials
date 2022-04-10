@@ -1,5 +1,5 @@
 #include "engine_pch.h"
-#include "Core/MeshAsset.h"
+#include "Core/Asset/MeshAsset.h"
 
 namespace ks
 {

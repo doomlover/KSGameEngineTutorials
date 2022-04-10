@@ -1,8 +1,9 @@
 #pragma once
 
 #include "Core/CoreMinimal.h"
-#include "Core/Assets.h"
+#include "Core/Asset/Assets.h"
 #include "Render/MeshRenderData.h"
+#include "Core/Asset/MaterialData.h"
 
 namespace ks {
 
@@ -12,6 +13,15 @@ namespace ks {
 		uint32 Stride{0};
 		std::vector<uint8> Data;
 		FMeshAttributeData() = default;
+		FMeshAttributeData(const FMeshAttributeData& Other) {
+			*this = Other;
+		}
+		FMeshAttributeData& operator=(const FMeshAttributeData& Other) {
+			Count = Other.Count;
+			Stride = Other.Stride;
+			Data = Other.Data;
+			return *this;
+		}
 		FMeshAttributeData(FMeshAttributeData&& Tmp) noexcept {
 			*this = std::move(Tmp);
 		}
@@ -34,8 +44,23 @@ namespace ks {
 		FMeshAttributeData PositionData;
 		// other attributes include normal, texcoord, etc
 		FMeshAttributeData AttributeData;
+		// material, TODO : is redundant when material asset is created
+		FMaterialData MaterialData;
 
 		FMeshData() = default;
+
+		FMeshData(const FMeshData& Other) {
+			*this = Other;
+		}
+		FMeshData& operator=(const FMeshData& Other) {
+			KeyName = Other.KeyName;
+			IndexDataType = Other.IndexDataType;
+			IndexRawData = Other.IndexRawData;
+			PositionData = Other.PositionData;
+			AttributeData = Other.AttributeData;
+			MaterialData = Other.MaterialData;
+			return *this;
+		}
 		FMeshData(FMeshData&& TempMeshData) noexcept {
 			*this = std::move(TempMeshData);
 		}
@@ -45,6 +70,7 @@ namespace ks {
 			IndexRawData = std::move(Tmp.IndexRawData);
 			PositionData = std::move(Tmp.PositionData);
 			AttributeData = std::move(Tmp.AttributeData);
+			MaterialData = std::move(Tmp.MaterialData);
 			return *this;
 		}
 	};
@@ -52,18 +78,21 @@ namespace ks {
 	class FStaticMeshAsset : public IAsset
 	{
 	public:
-		FStaticMeshAsset(const std::string& Path, FMeshData& InMeshData) :IAsset(Path), MeshData(std::move(InMeshData)) {}
+		FStaticMeshAsset(const FMeshData& _MeshData);
+		FStaticMeshAsset(FMeshData&& _MeshData);
 		virtual ~FStaticMeshAsset() {}
 		virtual void PostLoad() override;
 		FMeshRenderData* GetRenderData() { return RenderData.get(); }
-
+		class FMaterialAsset* GetMaterialAsset() { return MaterialAsset; }
 	private:
 		void InitRenderData();
-
+		void CreateMaterialAssetInter();
 		// raw data
 		FMeshData MeshData;
 		// rendering, render data
 		std::unique_ptr<FMeshRenderData> RenderData;
+		// material
+		FMaterialAsset* MaterialAsset{nullptr};
 	};
 
 }

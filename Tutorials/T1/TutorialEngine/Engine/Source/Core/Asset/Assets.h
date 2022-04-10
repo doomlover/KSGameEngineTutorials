@@ -303,6 +303,20 @@ namespace gltf
 		}
 	};
 
+	struct FMaterial
+	{
+		std::string name;
+		struct FPBRMetallicRoughness
+		{
+			float baseColorFactor[4]{0.f};
+			float metallicFactor{0.f};
+			float roughnessFactor{0.f};
+			NLOHMANN_DEFINE_TYPE_INTRUSIVE(FPBRMetallicRoughness, baseColorFactor, metallicFactor, roughnessFactor)
+		};
+		FPBRMetallicRoughness pbrMetallicRoughness;
+		NLOHMANN_DEFINE_TYPE_INTRUSIVE(FMaterial, name, pbrMetallicRoughness)
+	};
+
 	struct FScene
 	{
 		int32 scene = -1;
@@ -314,9 +328,11 @@ namespace gltf
 		std::vector<FBufferView> bufferViews;
 		std::vector<FBuffer> buffers;
 		std::vector<FCamera> cameras;
+		std::vector<FMaterial> materials;
 		FExtension extensions;
 
-		NLOHMANN_DEFINE_TYPE_INTRUSIVE(FScene, scene, scenes, nodes, meshes, accessors, bufferViews, buffers, cameras, extensions)
+		NLOHMANN_DEFINE_TYPE_INTRUSIVE(FScene, scene, scenes, nodes, meshes,
+			accessors, bufferViews, buffers, cameras, materials, extensions)
 		friend std::ostringstream& operator<<(std::ostringstream& outstream, const FScene& obj)
 		{
 			outstream << "scene : ";
@@ -384,28 +400,4 @@ namespace gltf
 
 		gltf::FScene GltfScene;
 	};
-
-	class FAssetManager
-	{
-	public:
-		static FAssetManager* Create();
-		~FAssetManager() {
-			KS_INFO(TEXT("~FAssetManager"));
-		}
-		void Init();
-		void Shutdown();
-		// Create scene asset from gltf file
-		std::shared_ptr<FSceneAsset> CreateSceneAsset(const std::string& GLTFScenePath);
-		// Create static mesh asset
-		std::shared_ptr<FStaticMeshAsset> CreateStaticMeshAsset(const FMeshData& MeshData);
-
-		std::shared_ptr<IAsset> GetAsset(const std::string& Path);
-
-	private:
-
-		std::unordered_map<std::string, IAsset::FRefType> Assets;
-		using FSizeType = std::unordered_map<std::string, IAsset::FRefType>::size_type;
-	};
-
-	extern FAssetManager* GAssetManager;
 }

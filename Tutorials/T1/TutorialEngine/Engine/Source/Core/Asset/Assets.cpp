@@ -1,6 +1,8 @@
 #include "engine_pch.h"
-#include "Core/Assets.h"
-#include "Core/MeshAsset.h"
+#include "Core/Asset/Assets.h"
+#include "Core/Asset/MeshAsset.h"
+#include "Core/Asset/MaterialData.h"
+#include "Core/Asset/AssetManager.h"
 #include "Core/Scene.h"
 
 namespace ks {
@@ -29,7 +31,7 @@ namespace ks {
 			/* get elem type enum by the type name */
 			EELEM_TYPE GetElemType(const std::string& TypeName);
 			/* key name used by asset manager */
-			std::string GetMeshKeyName(const FScene& Scene, const std::string& MeshName) {
+			std::string GetAssetKeyName(const FScene& Scene, const std::string& MeshName) {
 				return Scene.root + "/" + MeshName;
 			}
 			/* set node parent id */
@@ -104,51 +106,6 @@ namespace ks {
 		}
 	}
 
-	FAssetManager* GAssetManager = nullptr;
-
-	ks::FAssetManager* FAssetManager::Create()
-	{
-		return GAssetManager = new FAssetManager;
-	}
-
-	void FAssetManager::Init()
-	{
-		KS_INFO(TEXT("FAssetManager::Init"));
-	}
-
-	void FAssetManager::Shutdown()
-	{
-		KS_INFO(TEXT("\tFAssetManager::Shutdown"));
-	}
-
-	std::shared_ptr<FSceneAsset> FAssetManager::CreateSceneAsset(const std::string& InGLTFPath)
-	{
-		KS_INFO(TEXT("FAssetManager::Load GLTF Scene"));
-
-		if (InGLTFPath.empty())
-		{
-			return nullptr;
-		}
-		assert(InGLTFPath.ends_with(".gltf"));
-		assert(Assets.find(InGLTFPath) == Assets.end());
-		std::shared_ptr<FSceneAsset> SceneAsset = std::make_shared<FSceneAsset>(InGLTFPath);
-		Assets.insert({ InGLTFPath, SceneAsset });
-		return SceneAsset;
-	}
-
-	std::shared_ptr<ks::FStaticMeshAsset> FAssetManager::CreateStaticMeshAsset(const FMeshData& MeshData)
-	{
-		std::shared_ptr<FStaticMeshAsset> Asset = std::make_shared<FStaticMeshAsset>(MeshData.KeyName, const_cast<FMeshData&>(MeshData));
-		Assets.insert({Asset->GetPath(), Asset});
-		return Asset;
-	}
-
-	std::shared_ptr<ks::IAsset> FAssetManager::GetAsset(const std::string& Path)
-	{
-		auto& Asset = Assets.at(Path);
-		return Asset;
-	}
-
 	IAsset::~IAsset()
 	{
 		// check if any ref-asset needs to be released
@@ -217,7 +174,7 @@ namespace ks {
 		if (GLTF_NodeInfo.mesh != -1)
 		{
 			const gltf::FMesh& GLTF_Mesh = GltfScene.meshes.at(GLTF_NodeInfo.mesh);
-			NodeInfo.MeshAssetKeyName = gltf::GetMeshKeyName(GltfScene, GLTF_Mesh.name);
+			NodeInfo.MeshAssetKeyName = gltf::GetAssetKeyName(GltfScene, GLTF_Mesh.name);
 		}
 
 		if (GLTF_NodeInfo.camera != -1)
@@ -312,7 +269,7 @@ namespace ks {
 			void LoadMeshData(const FScene& Scene, const FMesh& Mesh, FMeshData& MeshData)
 			{
 				// get key name
-				MeshData.KeyName = GetMeshKeyName(Scene, Mesh.name);
+				MeshData.KeyName = GetAssetKeyName(Scene, Mesh.name);
 				KS_INFOA(MeshData.KeyName.c_str());
 
 				const gltf::FMesh::FPrimitive& Primitive = Mesh.primitives.at(0);
@@ -385,6 +342,17 @@ namespace ks {
 					MeshData.AttributeData.Count = ElemCount;
 					MeshData.AttributeData.Stride = static_cast<uint32>(Stride);
 					MeshData.AttributeData.Data = std::move(Data);
+				}
+				// load material data
+				if (Primitive.material != -1)
+				{
+					FMaterialData& MaterialData{MeshData.MaterialData};
+					const int32& MaterialId{Primitive.material};
+					const FMaterial& Material{Scene.materials.at(MaterialId)};
+					MaterialData.KeyName = GetAssetKeyName(Scene, Material.name);
+					memcpy(&MaterialData.BaseColorFactor[0], &Material.pbrMetallicRoughness.baseColorFactor[0], sizeof(float)*_countof(MaterialData.BaseColorFactor));
+					MaterialData.MetallicFactor = Material.pbrMetallicRoughness.metallicFactor;
+					MaterialData.RoughnessFactor = Material.pbrMetallicRoughness.roughnessFactor;
 				}
 			}
 

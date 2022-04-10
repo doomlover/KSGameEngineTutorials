@@ -62,6 +62,12 @@
     <Filter Include="Source\Private\Render">
       <UniqueIdentifier>{10f6862c-3154-44df-8b5a-1d82d37ae189}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Public\Core\Component">
+      <UniqueIdentifier>{2e88946c-e594-42f0-8bc0-038a6150b25e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Private\Core\Component">
+      <UniqueIdentifier>{c01e7176-b9aa-4cac-a312-c1ae3f9a3f4c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\engine_pch.cpp">
@@ -85,13 +91,13 @@
     <ClCompile Include="Source\Core\Scene.cpp">
       <Filter>Source\Private\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Core\Assets.cpp">
+    <ClCompile Include="Source\Core\Asset\Assets.cpp">
       <Filter>Source\Private\Core\Asset</Filter>
     </ClCompile>
     <ClCompile Include="Source\Render\Render.cpp">
       <Filter>Source\Private\Render</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Core\MeshAsset.cpp">
+    <ClCompile Include="Source\Core\Asset\MeshAsset.cpp">
       <Filter>Source\Private\Core\Asset</Filter>
     </ClCompile>
     <ClCompile Include="Source\Render\MeshRenderData.cpp">
@@ -103,7 +109,11 @@
     <ClCompile Include="Source\RHI\D3D12\D3D12PipelineState.cpp">
       <Filter>Source\Private\RHI\D3D12</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Core\Component\LightComponent.cpp" />
+    <ClCompile Include="Source\Core\Component\LightComponent.cpp">
+      <Filter>Source\Private\Core\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\Asset\MaterialAsset.cpp" />
+    <ClCompile Include="Source\Core\Asset\AssetManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\engine_pch.h">
@@ -163,10 +173,10 @@
     <ClInclude Include="Source\Core\Scene.h">
       <Filter>Source\Public\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Core\Assets.h">
+    <ClInclude Include="Source\Core\Asset\Assets.h">
       <Filter>Source\Public\Core\Asset</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Core\MeshAsset.h">
+    <ClInclude Include="Source\Core\Asset\MeshAsset.h">
       <Filter>Source\Public\Core\Asset</Filter>
     </ClInclude>
     <ClInclude Include="Source\Render\Render.h">
@@ -184,7 +194,14 @@
     <ClInclude Include="Source\RHI\RHIPipelineStateDesc.h">
       <Filter>Source\Public\RHI</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Core\Component\Component.h" />
-    <ClInclude Include="Source\Core\Component\LightComponent.h" />
+    <ClInclude Include="Source\Core\Component\LightComponent.h">
+      <Filter>Source\Public\Core\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\Component\Component.h">
+      <Filter>Source\Public\Core\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\Asset\MaterialAsset.h" />
+    <ClInclude Include="Source\Core\Asset\MaterialData.h" />
+    <ClInclude Include="Source\Core\Asset\AssetManager.h" />
   </ItemGroup>
 </Project>

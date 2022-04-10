@@ -137,6 +137,7 @@ namespace ks
 		FScene(std::shared_ptr<FSceneAsset> SceneAsset);
 		FRenderScene* GetRenderScene() { return RenderScene; }
 		void Update(){}
+		FSceneNode* GetCamera() { return Camera; }
 		glm::mat4 GetViewTrans() {
 			glm::mat4 Eye2World{ Camera->GetWorldTrans() };
 			glm::mat4 World2Eye{ glm::affineInverse(Eye2World) };

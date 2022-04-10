@@ -129,7 +129,7 @@ namespace ks::d3d12
 			));
 		}
 		virtual ~FD3D12Resource(){
-			D3D12Resource->Unmap(0, nullptr);
+			//D3D12Resource->Unmap(0, nullptr);
 			D3D12Resource.Reset();
 		}
 		virtual void* Map() override

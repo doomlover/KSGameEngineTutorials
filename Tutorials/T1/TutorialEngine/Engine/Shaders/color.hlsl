@@ -1,49 +1,57 @@
 
 cbuffer PrimitiveConstBuffer : register(b0)
 {
-	float4x4 gWorld; 
-	float4x4 gWorldInvTrans;
+	float4x4 World;
+	float4x4 WorldInvTrans;
+	float4 BaseColorFactor;
+	float4 RoughnessMetallicFactor;
 };
 
 cbuffer PassConstBuffer : register(b1)
 {
-	float4x4 view_proj_mat;
-	float3 directional_light_dir;
-	float directional_light_intensity;
+	float4x4 ViewProj;
+	float4 D_LightDirAndIns;
+	float3 EyePosW;
 };
 
-struct VertexIn
+struct Vertex
 {
 	float3 PosL  : POSITION;
 	float3 NormL : NORMAL;
 };
 
-struct VertexOut
+struct Pixel
 {
 	float4 PosH  : SV_POSITION;
-	float3 norm_w : NORMAL;
+	float4 PosW  : POSITION;
+	float3 NormW : NORMAL;
 };
 
-VertexOut VS(VertexIn vin)
+Pixel VS(Vertex InVert)
 {
-	VertexOut vout;
-	
-	// Transform to homogeneous clip space.
-    float4 posW = mul(float4(vin.PosL, 1.0f), gWorld);
-    vout.PosH = mul(posW, view_proj_mat);
-	
-	vout.norm_w = mul(vin.NormL, (float3x3)gWorldInvTrans);
-    
-    return vout;
+	Pixel Out;
+	// trans pos from local to homogeneous clip space.
+	Out.PosW = mul(float4(InVert.PosL, 1.0f), World);
+	Out.PosH = mul(Out.PosW, ViewProj);
+	// trans normal from local to world
+	Out.NormW = mul(InVert.NormL, (float3x3)WorldInvTrans);
+
+	return Out;
 }
 
-float4 PS(VertexOut pin) : SV_Target
+float4 PS(Pixel InPix) : SV_Target
 {
 	// normalize
-	float3 normal = normalize(pin.norm_w);
-	float n_dot_l = max(dot(directional_light_dir, normal), 0.0f);
-	float3 out_color = float3(1.0f, 1.0f, 1.0f) * n_dot_l * directional_light_intensity;
-    return float4(out_color, 1.0f);
+	float3 NormW = normalize(InPix.NormW);
+	float NdotL = max(dot(NormW, D_LightDirAndIns.xyz), 0.0f);
+	float3 OutColor = BaseColorFactor.xyz * (NdotL * D_LightDirAndIns.w + 0.05f);
+
+	float3 ToEye = normalize(EyePosW - InPix.PosW.xyz);
+	float3 H = normalize(ToEye + D_LightDirAndIns.xyz);
+	float HdotN = max(dot(H, NormW), 0.0f);
+	OutColor += 0.65f * pow(HdotN, 32);
+
+	return float4(OutColor, 1.0f);
 }
 
 

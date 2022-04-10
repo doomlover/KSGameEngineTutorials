@@ -2,7 +2,8 @@
 #include "engine_pch.h"
 #include "Engine.h"
 #include "RHI/RHI.h"
-#include "Core/Assets.h"
+#include "Core/Asset/Assets.h"
+#include "Core/Asset/AssetManager.h"
 #include "Core/Scene.h"
 #include "Render/Render.h"
 
