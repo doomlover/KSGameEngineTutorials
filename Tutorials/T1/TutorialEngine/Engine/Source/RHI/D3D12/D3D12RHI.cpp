@@ -11,8 +11,21 @@
 namespace ks::d3d12
 {
 	const uint32 MAX_CBV_NUM = 128;
-
 	FD3D12RHI* GD3D12RHI = nullptr;
+	ID3D12Device* GD3D12Device = nullptr;
+	ID3D12GraphicsCommandList* GGfxCmdlist = nullptr;
+
+	DXGI_FORMAT GetDXGIFormat(EELEM_FORMAT ElemFormat)
+	{
+		static const std::unordered_map<EELEM_FORMAT, DXGI_FORMAT> FormatTable = {
+			{EELEM_FORMAT::R8_UINT,				DXGI_FORMAT::DXGI_FORMAT_R8_UINT},
+			{EELEM_FORMAT::R8_INT,				DXGI_FORMAT::DXGI_FORMAT_R8_SINT},
+			{EELEM_FORMAT::R16_INT,				DXGI_FORMAT::DXGI_FORMAT_R16_SINT},
+			{EELEM_FORMAT::R16_UINT,			DXGI_FORMAT::DXGI_FORMAT_R16_UINT},
+			{EELEM_FORMAT::R32G32B32_FLOAT,		DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT},
+		};
+		return FormatTable.at(ElemFormat);
+	}
 
 	void FDescriptorHeap::Init(uint32 _Capacity, bool bShaderVisiable)
 	{
@@ -94,11 +107,12 @@ namespace ks::d3d12
 		ID3D12CommandAllocator* CommandAllocator{nullptr};
 		ID3D12CommandQueue* CommandQueue{nullptr};
 	};
-
+}
+namespace ks::d3d12
+{
 namespace
 {
-	uint32 CalcConstantBufferByteSize(uint32 byteSize)
-	{
+	uint32 CalcConstantBufferByteSize(uint32 byteSize) {
 		// Constant buffers must be a multiple of the minimum hardware
 		// allocation size (usually 256 bytes).  So round up to nearest
 		// multiple of 256.  We do this by adding 255 and then masking off
@@ -112,11 +126,53 @@ namespace
 		// 512
 		return (byteSize + 255) & ~255;
 	}
+
+	/*
+	* #define GRootSignature \
+	* "RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT)," \
+	* "DescriptorTable(" \
+	* "CBV(b0)," \
+	* "CBV(b1)),"
+	*/
+	void CreateGlobalRootSignature(ComPtr<ID3D12RootSignature>& RootSignature) {
+		CD3DX12_DESCRIPTOR_RANGE cbvTable0;
+		cbvTable0.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
+
+		CD3DX12_DESCRIPTOR_RANGE cbvTable1;
+		cbvTable1.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
+
+		// Root parameter can be a table, root descriptor or root constants.
+		CD3DX12_ROOT_PARAMETER slotRootParameter[2];
+
+		// Create root CBVs.
+		slotRootParameter[0].InitAsDescriptorTable(1, &cbvTable0);
+		slotRootParameter[1].InitAsDescriptorTable(1, &cbvTable1);
+
+		// A root signature is an array of root parameters.
+		CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(2, slotRootParameter, 0, nullptr,
+			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+
+		// create a root signature with a single slot which points to a descriptor range consisting of a single constant buffer
+		ComPtr<ID3DBlob> serializedRootSig = nullptr;
+		ComPtr<ID3DBlob> errorBlob = nullptr;
+		KS_D3D12_CALL(D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1,
+			serializedRootSig.GetAddressOf(), errorBlob.GetAddressOf()));
+
+		if (errorBlob != nullptr)
+		{
+			KS_INFOA((char*)errorBlob->GetBufferPointer());
+		}
+
+		KS_D3D12_CALL(GD3D12Device->CreateRootSignature(
+			0,
+			serializedRootSig->GetBufferPointer(),
+			serializedRootSig->GetBufferSize(),
+			IID_PPV_ARGS(RootSignature.GetAddressOf())));
+	}
 }
-
-	ID3D12Device* GD3D12Device = nullptr;
-	ID3D12GraphicsCommandList* GGfxCmdlist = nullptr;
-
+}
+namespace ks::d3d12
+{
 	FD3D12RHI::~FD3D12RHI()
 	{
 		KS_INFO(TEXT("~FD3D12RHI"));
@@ -240,14 +296,16 @@ namespace
 			KS_D3D12_CALL(D3D12Device->CreateDescriptorHeap(
 				&dsvHeapDesc, IID_PPV_ARGS(D3D12DSVHeap.GetAddressOf())));
 		}
-		// create constant buffer descriptor heap
-		{
-			CBVHeap.Init(d3d12::MAX_CBV_NUM, true);
-		}
 
-		{
-			d3d12::GD3D12RHI = this;
-		}
+		// create constant buffer descriptor heap
+		CBVHeap.Init(d3d12::MAX_CBV_NUM, true);
+
+		// create global root signature
+		CreateGlobalRootSignature(GlobalRootSignature);
+
+		// setup the global RHI pointer
+		d3d12::GD3D12RHI = this;
+
 		ResizeWindow();
 	}
 
@@ -538,7 +596,7 @@ namespace
 		ID3D12PipelineState* pPipelineState{D3D12PipelineState->PipelineState.Get()};
 		GGfxCmdlist->SetPipelineState(pPipelineState);
 
-		GGfxCmdlist->SetGraphicsRootSignature(D3D12PipelineState->RootSignature.Get());
+		GGfxCmdlist->SetGraphicsRootSignature(D3D12PipelineState->pRootSignature);
 
 		GGfxCmdlist->IASetPrimitiveTopology(D3D12PipelineState->PrimitiveType);
 	}
@@ -598,25 +656,6 @@ namespace
 		D3D12VertBuffer->BufferView.SizeInBytes = Size;
 		return D3D12VertBuffer;
 	}
-
-namespace
-{
-	DXGI_FORMAT GetDXGIFormat(EELEM_FORMAT ElemFormat)
-	{
-		switch(ElemFormat)
-		{
-		case EELEM_FORMAT::R8_UINT:
-			return DXGI_FORMAT::DXGI_FORMAT_R8_UINT;
-		case EELEM_FORMAT::R8_INT:
-			return DXGI_FORMAT::DXGI_FORMAT_R8_SINT;
-		case EELEM_FORMAT::R16_INT:
-			return DXGI_FORMAT::DXGI_FORMAT_R16_SINT;
-		case EELEM_FORMAT::R16_UINT:
-			return DXGI_FORMAT::DXGI_FORMAT_R16_UINT;
-		}
-		return DXGI_FORMAT::DXGI_FORMAT_UNKNOWN;
-	}
-}
 
 	ks::IRHIIndexBuffer* FD3D12RHI::CreateIndexBuffer(EELEM_FORMAT ElemFormat, uint32 Stride, uint32 Size, const void* Data)
 	{

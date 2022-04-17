@@ -6,43 +6,6 @@ namespace ks::d3d12
 {
 namespace
 {
-	void BuildRootSignature(ComPtr<ID3D12RootSignature>& RootSignature)
-	{
-		CD3DX12_DESCRIPTOR_RANGE cbvTable0;
-		cbvTable0.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
-
-		CD3DX12_DESCRIPTOR_RANGE cbvTable1;
-		cbvTable1.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
-
-		// Root parameter can be a table, root descriptor or root constants.
-		CD3DX12_ROOT_PARAMETER slotRootParameter[2];
-
-		// Create root CBVs.
-		slotRootParameter[0].InitAsDescriptorTable(1, &cbvTable0);
-		slotRootParameter[1].InitAsDescriptorTable(1, &cbvTable1);
-
-		// A root signature is an array of root parameters.
-		CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(2, slotRootParameter, 0, nullptr,
-			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
-
-		// create a root signature with a single slot which points to a descriptor range consisting of a single constant buffer
-		ComPtr<ID3DBlob> serializedRootSig = nullptr;
-		ComPtr<ID3DBlob> errorBlob = nullptr;
-		KS_D3D12_CALL(D3D12SerializeRootSignature(&rootSigDesc, D3D_ROOT_SIGNATURE_VERSION_1,
-			serializedRootSig.GetAddressOf(), errorBlob.GetAddressOf()));
-
-		if (errorBlob != nullptr)
-		{
-			KS_INFOA((char*)errorBlob->GetBufferPointer());
-		}
-
-		KS_D3D12_CALL(GD3D12Device->CreateRootSignature(
-			0,
-			serializedRootSig->GetBufferPointer(),
-			serializedRootSig->GetBufferSize(),
-			IID_PPV_ARGS(RootSignature.GetAddressOf())));
-	}
-
 	ComPtr<ID3DBlob> CompileShader(
 		const std::wstring& filename,
 		const D3D_SHADER_MACRO* defines,
@@ -70,54 +33,73 @@ namespace
 		return byteCode;
 	}
 
-	void BuildShaders(std::unordered_map<std::string, ComPtr<ID3DBlob>>& Shaders)
+	void BuildVertexShader(std::unordered_map<std::string, ComPtr<ID3DBlob>>& Shaders, const FVertexShaderDesc& ShaderDesc)
 	{
-		std::wstring ShaderPath{FString::S2WS(util::GetShaderPath("color.hlsl"))};
-		Shaders["standardVS"] = CompileShader(ShaderPath, nullptr, "VS", "vs_5_1");
-		Shaders["opaquePS"] = CompileShader(ShaderPath, nullptr, "PS", "ps_5_1");
+		auto ShaderFile = FString::S2WS(ShaderDesc.File);
+		Shaders[ShaderDesc.Name] = CompileShader(ShaderFile, nullptr, ShaderDesc.EntryPoint, "vs_5_1");
+	}
+
+	void BuildPixelShader(std::unordered_map<std::string, ComPtr<ID3DBlob>>& Shaders, const FPixelShaderDesc& ShaderDesc)
+	{
+		auto ShaderFile = FString::S2WS(ShaderDesc.File);
+		Shaders[ShaderDesc.Name] = CompileShader(ShaderFile, nullptr, ShaderDesc.EntryPoint, "ps_5_1");
 	}
 }
 
 	FD3D12PipelineState::FD3D12PipelineState(const FRHIPipelineStateDesc& Desc)
 		:IRHIPipelineState(Desc)
 	{
-		std::vector<D3D12_INPUT_ELEMENT_DESC> InputLayout =
+		const auto& InputElemDesc{Desc.InputLayout};
+		std::vector<D3D12_INPUT_ELEMENT_DESC> InputLayout(Desc.InputLayout.size());
+		for (int32 i{0}; i < Desc.InputLayout.size(); ++i)
 		{
-			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-			{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 1, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		};
+			InputLayout[i].SemanticName = InputElemDesc[i].SemanticName.c_str();
+			InputLayout[i].SemanticIndex = InputElemDesc[i].SemanticIndex;
+			InputLayout[i].Format = GetDXGIFormat(InputElemDesc[i].ElemFormat);
+			InputLayout[i].InputSlot = InputElemDesc[i].InputSlot;
+			InputLayout[i].AlignedByteOffset = InputElemDesc[i].Stride;
+			InputLayout[i].InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
+			InputLayout[i].InstanceDataStepRate = 0;
+		}
+
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC D3D12Desc;
 		ZeroMemory(&D3D12Desc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
 
 		D3D12Desc.InputLayout = {InputLayout.data(), static_cast<UINT>(InputLayout.size())};
 
-		BuildRootSignature(RootSignature);
-		D3D12Desc.pRootSignature = RootSignature.Get();
+		pRootSignature = GD3D12RHI->GetGlobalRootSignature();
+		D3D12Desc.pRootSignature = pRootSignature;
 
-		BuildShaders(Shaders);
+		BuildVertexShader(Shaders, Desc.VertexShaderDesc);
+		BuildPixelShader(Shaders, Desc.PixelShaderDesc);
 		D3D12Desc.VS =
 		{
-			reinterpret_cast<BYTE*>(Shaders["standardVS"]->GetBufferPointer()),
-			Shaders["standardVS"]->GetBufferSize()
+			reinterpret_cast<BYTE*>(Shaders[Desc.VertexShaderDesc.Name]->GetBufferPointer()),
+			Shaders[Desc.VertexShaderDesc.Name]->GetBufferSize()
 		};
 		D3D12Desc.PS =
 		{
-			reinterpret_cast<BYTE*>(Shaders["opaquePS"]->GetBufferPointer()),
-			Shaders["opaquePS"]->GetBufferSize()
+			reinterpret_cast<BYTE*>(Shaders[Desc.PixelShaderDesc.Name]->GetBufferPointer()),
+			Shaders[Desc.PixelShaderDesc.Name]->GetBufferSize()
 		};
 		D3D12Desc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-		//D3D12Desc.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
 		D3D12Desc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
 		D3D12Desc.RasterizerState.FrontCounterClockwise = TRUE;
+
 		D3D12Desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+
 		D3D12Desc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+
 		D3D12Desc.SampleMask = UINT_MAX;
+
 		D3D12Desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+
 		D3D12Desc.NumRenderTargets = 1;
 		D3D12Desc.RTVFormats[0] = d3d12::GD3D12RHI->GetBackbufferFormat();
+		D3D12Desc.DSVFormat = d3d12::GD3D12RHI->GetDepthbufferFormat();
+
 		D3D12Desc.SampleDesc.Count = 1;
 		D3D12Desc.SampleDesc.Quality = 0;
-		D3D12Desc.DSVFormat = d3d12::GD3D12RHI->GetDepthbufferFormat();
 		KS_D3D12_CALL(GD3D12Device->CreateGraphicsPipelineState(&D3D12Desc, IID_PPV_ARGS(PipelineState.GetAddressOf())));
 	}
 

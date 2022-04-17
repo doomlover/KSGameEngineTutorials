@@ -71,6 +71,7 @@ namespace ks::d3d12
 		d3d12::FDescriptorHeap& GetCBVHeap() { return CBVHeap; }
 		DXGI_FORMAT GetBackbufferFormat() const { return BackBufferFormat; }
 		DXGI_FORMAT GetDepthbufferFormat() const { return DepthBufferFormat; }
+		ID3D12RootSignature* GetGlobalRootSignature() { return GlobalRootSignature.Get(); }
 	private:
 		HWND hWnd;
 		ComPtr<IDXGIFactory7> DXGIFactory;
@@ -107,6 +108,7 @@ namespace ks::d3d12
 
 		/***************************************************************/
 		d3d12::FDescriptorHeap CBVHeap{D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV};
+		ComPtr<ID3D12RootSignature> GlobalRootSignature{ nullptr };
 	};
 
 

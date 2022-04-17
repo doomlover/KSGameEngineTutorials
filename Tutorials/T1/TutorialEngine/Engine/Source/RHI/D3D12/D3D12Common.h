@@ -169,5 +169,7 @@ namespace Colors
 	const KS_D3D12_COLOR(Yellow )= { 1.000000000f, 1.000000000f, 0.000000000f, 1.000000000f };
 	const KS_D3D12_COLOR(YellowGreen) = { 0.603921592f, 0.803921640f, 0.196078449f, 1.000000000f };
 }//~Colors
+
+DXGI_FORMAT GetDXGIFormat(EELEM_FORMAT ElemFormat);
 }//~d3d12
 }//~ks

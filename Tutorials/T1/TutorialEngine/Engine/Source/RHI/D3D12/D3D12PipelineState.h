@@ -12,7 +12,7 @@ namespace ks::d3d12
 		virtual ~FD3D12PipelineState(){}
 	private:
 		ComPtr<ID3D12PipelineState> PipelineState{nullptr};
-		ComPtr<ID3D12RootSignature> RootSignature{nullptr};
+		ID3D12RootSignature* pRootSignature{nullptr};
 		D3D12_PRIMITIVE_TOPOLOGY PrimitiveType{ D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST };
 		std::unordered_map<std::string, ComPtr<ID3DBlob>> Shaders;
 	};

@@ -114,7 +114,12 @@ namespace ks
 		FRenderPassDesc Desc{};
 		Desc.Name = "BasePass";
 		Desc.Renderer = this;
-		Desc.PipelineStateDesc;
+		Desc.PipelineStateDesc.InputLayout = {
+			{"POSITION", 0, EELEM_FORMAT::R32G32B32_FLOAT, 0, 0},
+			{"NORMAL", 0, EELEM_FORMAT::R32G32B32_FLOAT, 1, 0}
+		};
+		Desc.PipelineStateDesc.VertexShaderDesc = {"BasePassVS", util::GetShaderPath("BasePass.hlsl"), "VS"};
+		Desc.PipelineStateDesc.PixelShaderDesc = {"BasePassPS", util::GetShaderPath("BasePass.hlsl"), "PS"};
 		FRenderPass* Pass = FRenderPass::CreatePass(Desc);
 		assert(Pass);
 	}
