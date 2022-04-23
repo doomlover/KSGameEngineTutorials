@@ -5,6 +5,7 @@
 #include "Core/Asset/AssetManager.h"
 #include "Render/Render.h"
 #include "Core/Application.h"
+#include "Core/Component/MeshComponent.h"
 
 namespace ks
 {
@@ -74,10 +75,8 @@ namespace ks
 	{
 		if (!NodeInfo.MeshAssetKeyName.empty())
 		{
-			StaticMeshComponent = std::make_unique<FStaticMeshComponent>();
-			StaticMeshComponent->ParentNode = this;
 			std::shared_ptr<IAsset> Asset = GAssetManager->GetAsset(NodeInfo.MeshAssetKeyName);
-			StaticMeshComponent->SetStaticMesh(std::dynamic_pointer_cast<FStaticMeshAsset>(Asset));
+			StaticMeshComponent = std::make_unique<FStaticMeshComponent>(this, std::dynamic_pointer_cast<FStaticMeshAsset>(Asset));
 		}
 		if (NodeInfo.Camera.Type != ECameraType::INVALID)
 		{

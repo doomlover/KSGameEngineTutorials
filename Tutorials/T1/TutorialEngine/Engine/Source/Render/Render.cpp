@@ -5,12 +5,14 @@
 #include "Core/Scene.h"
 #include "Core/Asset/MeshAsset.h"
 #include "Core/Asset/MaterialAsset.h"
+#include "Core/Component/MeshComponent.h"
 #include "RHI/RHI.h"
 
 namespace ks
 {
 	FRenderPrimitive::FRenderPrimitive(FStaticMeshComponent* MeshComponent)
 		:RenderData(MeshComponent->GetStaticMesh()->GetRenderData())
+		,Bounds(MeshComponent->GetBounds())
 	{
 		FPrimitiveConstBufferParameter ConstBufferParameter;
 		ConstBufferParameter.WorldTrans = MeshComponent->GetWorldTrans();

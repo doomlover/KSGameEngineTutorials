@@ -175,108 +175,121 @@ namespace gltf
 	* 5126 FLOAT
 	*/
 	struct FAccessor
+	{
+		int32 bufferView = -1;
+		int32 count = 0;
+		std::string type;
+		int32 componentType = -1;
+		std::array<float, 3> min{0, 0, 0};
+		std::array<float, 3> max{0, 0, 0};
+		friend std::ostringstream& operator<<(std::ostringstream& _ostream, const FAccessor& accessor)
 		{
-			int32 bufferView = -1;
-			int32 count = 0;
-			std::string type;
-			int32 componentType = -1;
-			friend std::ostringstream& operator<<(std::ostringstream& _ostream, const FAccessor& accessor)
-			{
-				_ostream << "\n{";
-				_ostream << "\n\tbufferView : " << accessor.bufferView;
-				_ostream << "\n\tcount : " << accessor.count;
-				_ostream << "\n\ttype : " << accessor.type.c_str();
-				_ostream << "\n\tcomponentType : " << accessor.componentType;
-				_ostream << "\n}";
-				return _ostream;
+			_ostream << "\n{";
+			_ostream << "\n\tbufferView : " << accessor.bufferView;
+			_ostream << "\n\tcount : " << accessor.count;
+			_ostream << "\n\ttype : " << accessor.type.c_str();
+			_ostream << "\n\tcomponentType : " << accessor.componentType;
+			_ostream << "\n}";
+			return _ostream;
+		}
+		friend void to_json(json&, const FAccessor&) { assert(false); }
+		friend void from_json(const json& j, FAccessor& Accessor) {
+			j.at("bufferView").get_to(Accessor.bufferView);
+			j.at("count").get_to(Accessor.count);
+			j.at("type").get_to(Accessor.type);
+			j.at("componentType").get_to(Accessor.componentType);
+			if(j.contains("min") && j.contains("max")) {
+				j.at("min").get_to(Accessor.min);
+				j.at("max").get_to(Accessor.max);
 			}
-			NLOHMANN_DEFINE_TYPE_INTRUSIVE(FAccessor, bufferView, count, type, componentType)
-		};
+		}
+	};
 	/*
 	* target:
 	* 34962 ARRAY_BUFFER
 	* 34963 ELEMENT_ARRAY_BUFFER
 	*/
 	struct FBufferView
+	{
+		int32 buffer{ -1 };
+		int32 byteLength{ 0 };
+		int32 byteOffset{ 0 };
+		int32 target{ -1 };
+		friend void to_json(json&, const FBufferView&) { assert(false); }
+		friend void from_json(const json& j, FBufferView& BufferView)
 		{
-			int32 buffer{ -1 };
-			int32 byteLength{ 0 };
-			int32 byteOffset{ 0 };
-			int32 target{ -1 };
-			friend void to_json(json&, const FBufferView&) { assert(false); }
-			friend void from_json(const json& j, FBufferView& BufferView)
+			j.at("buffer").get_to(BufferView.buffer);
+			j.at("byteLength").get_to(BufferView.byteLength);
+			if (j.contains("byteOffset"))
 			{
-				j.at("buffer").get_to(BufferView.buffer);
-				j.at("byteLength").get_to(BufferView.byteLength);
-				if (j.contains("byteOffset"))
-				{
-					j.at("byteOffset").get_to(BufferView.byteOffset);
-				}
-				if (j.contains("target"))
-				{
-					j.at("target").get_to(BufferView.target);
-				}
+				j.at("byteOffset").get_to(BufferView.byteOffset);
 			}
-			friend std::ostringstream& operator<<(std::ostringstream& _ostream, const FBufferView& BufferView)
+			if (j.contains("target"))
 			{
-				_ostream << "\n{";
-				_ostream << "\n\tbuffer : " << BufferView.buffer;
-				_ostream << "\n\tbyteLength : " << BufferView.byteLength;
-				_ostream << "\n\tbyteOffset : " << BufferView.byteOffset;
-				_ostream << "\n\ttarget : " << BufferView.target;
-				_ostream << "\n}";
-				return _ostream;
+				j.at("target").get_to(BufferView.target);
 			}
-		};
+		}
+		friend std::ostringstream& operator<<(std::ostringstream& _ostream, const FBufferView& BufferView)
+		{
+			_ostream << "\n{";
+			_ostream << "\n\tbuffer : " << BufferView.buffer;
+			_ostream << "\n\tbyteLength : " << BufferView.byteLength;
+			_ostream << "\n\tbyteOffset : " << BufferView.byteOffset;
+			_ostream << "\n\ttarget : " << BufferView.target;
+			_ostream << "\n}";
+			return _ostream;
+		}
+	};
 
 	struct FBuffer
+	{
+		std::string uri;
+		int32 byteLength = 0;
+		std::vector<uint8> RawData;
+		friend std::ostringstream& operator<<(std::ostringstream& _ostream, const FBuffer& Buffer)
 		{
-			std::string uri;
-			int32 byteLength = 0;
-			std::vector<uint8> RawData;
-			friend std::ostringstream& operator<<(std::ostringstream& _ostream, const FBuffer& Buffer)
-			{
-				_ostream << "\n{";
-				_ostream << "\n\turi : " << Buffer.uri;
-				_ostream << "\n\tbyteLength : " << Buffer.byteLength;
-				_ostream << "\n}";
-				return _ostream;
-			}
-			NLOHMANN_DEFINE_TYPE_INTRUSIVE(FBuffer, uri, byteLength)
-		};
+			_ostream << "\n{";
+			_ostream << "\n\turi : " << Buffer.uri;
+			_ostream << "\n\tbyteLength : " << Buffer.byteLength;
+			_ostream << "\n}";
+			return _ostream;
+		}
+		NLOHMANN_DEFINE_TYPE_INTRUSIVE(FBuffer, uri, byteLength)
+	};
 
 	struct FCamera
+	{
+		std::string name;
+		std::string type;
+		struct FPerspective
 		{
-			std::string name;
-			std::string type;
-			struct FPerspective
-			{
-				float yfov;
-				float zfar;
-				float znear;
-				NLOHMANN_DEFINE_TYPE_INTRUSIVE(FPerspective, yfov, zfar, znear)
-			} perspective{};
-
-			struct FOrthographic
-			{
-				float xmag, ymag, zfar, znear;
-				NLOHMANN_DEFINE_TYPE_INTRUSIVE(FOrthographic, xmag, ymag, zfar, znear)
-			} orthographic{};
-
-			friend void to_json(json&, const FCamera&) { assert(false); }
-			friend void from_json(const json& j, FCamera& Camera) {
-				j.at("name").get_to(Camera.name);
-				j.at("type").get_to(Camera.type);
-				if (Camera.type == "perspective")
-				{
-					j.at("perspective").get_to(Camera.perspective);
-				}
-				else
-				{
-					j.at("orthographic").get_to(Camera.orthographic);
-				}
-			}
+			float yfov;
+			float zfar;
+			float znear;
+			NLOHMANN_DEFINE_TYPE_INTRUSIVE(FPerspective, yfov, zfar, znear)
 		};
+		FPerspective perspective{};
+
+		struct FOrthographic
+		{
+			float xmag, ymag, zfar, znear;
+			NLOHMANN_DEFINE_TYPE_INTRUSIVE(FOrthographic, xmag, ymag, zfar, znear)
+		};
+		FOrthographic orthographic{};
+		friend void to_json(json&, const FCamera&) { assert(false); }
+		friend void from_json(const json& j, FCamera& Camera) {
+			j.at("name").get_to(Camera.name);
+			j.at("type").get_to(Camera.type);
+			if (Camera.type == "perspective")
+			{
+				j.at("perspective").get_to(Camera.perspective);
+			}
+			else
+			{
+				j.at("orthographic").get_to(Camera.orthographic);
+			}
+		}
+	};
 
 	struct FKHRLightsPunctual
 	{

@@ -2,13 +2,14 @@
 
 #include "Core/Math.h"
 #include "RHI/RHI.h"
+#include "Core/Bounds.h"
 
 namespace ks
 {
 
 	class FScene;
 	class FMeshRenderData;
-	struct FStaticMeshComponent;
+	class FStaticMeshComponent;
 
 	struct FViewConstBufferParameter
 	{
@@ -35,9 +36,11 @@ namespace ks
 		const FMeshRenderData* GetRenderData() const { return RenderData; }
 	private:
 		// reference FStaticMeshAsset::RenderData
-		FMeshRenderData* RenderData;
+		FMeshRenderData* RenderData{nullptr};
 		// primitive constant buffer
 		std::shared_ptr<ConstBufferType> PrimitiveConstBuffer;
+		// bounds
+		FBounds Bounds{};
 	};
 	/**********************************************************************/
 

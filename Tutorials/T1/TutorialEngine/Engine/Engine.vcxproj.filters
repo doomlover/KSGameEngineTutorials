@@ -114,6 +114,7 @@
     </ClCompile>
     <ClCompile Include="Source\Core\Asset\MaterialAsset.cpp" />
     <ClCompile Include="Source\Core\Asset\AssetManager.cpp" />
+    <ClCompile Include="Source\Core\Component\MeshComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\engine_pch.h">
@@ -203,5 +204,7 @@
     <ClInclude Include="Source\Core\Asset\MaterialAsset.h" />
     <ClInclude Include="Source\Core\Asset\MaterialData.h" />
     <ClInclude Include="Source\Core\Asset\AssetManager.h" />
+    <ClInclude Include="Source\Core\Bounds.h" />
+    <ClInclude Include="Source\Core\Component\MeshComponent.h" />
   </ItemGroup>
 </Project>

@@ -46,6 +46,9 @@ namespace ks {
 		FMeshAttributeData AttributeData;
 		// material, TODO : is redundant when material asset is created
 		FMaterialData MaterialData;
+		// bounds
+		glm::vec3 Min{0.f};
+		glm::vec3 Max{0.f};
 
 		FMeshData() = default;
 
@@ -84,6 +87,7 @@ namespace ks {
 		virtual void PostLoad() override;
 		FMeshRenderData* GetRenderData() { return RenderData.get(); }
 		class FMaterialAsset* GetMaterialAsset() { return MaterialAsset; }
+		const FMeshData& GetMeshData() { return MeshData; }
 	private:
 		void InitRenderData();
 		void CreateMaterialAssetInter();

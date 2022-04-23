@@ -302,6 +302,9 @@ namespace ks {
 					MeshData.PositionData.Count = MeshPositionData.Count;
 					MeshData.PositionData.Stride = static_cast<uint32>(MeshPositionData.GetStride());
 					MeshData.PositionData.Data = std::move(MeshPositionData.Data);
+					const auto& Accessor = GetAccessor(Scene, Primitive.attributes.at(MeshPositionData.Name));
+					memcpy(&MeshData.Min.x, Accessor.min.data(), Accessor.min.size() * sizeof(float));
+					memcpy(&MeshData.Max.x, Accessor.max.data(), Accessor.max.size() * sizeof(float));
 				}
 				// load all other vertex attributes
 				{

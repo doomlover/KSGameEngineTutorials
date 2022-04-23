@@ -2,14 +2,15 @@
 
 #include "Core/Math.h"
 #include "Component/LightComponent.h"
+#include "Component/MeshComponent.h"
+#include "Core/Bounds.h"
 
 namespace ks
 {
 	class FSceneAsset;
-	class FStaticMeshAsset;
 	class FCameraComponent;
 	class FRenderScene;
-	struct FStaticMeshComponent;
+	class FStaticMeshComponent;
 
 	enum class ECameraType : unsigned short
 	{
@@ -105,19 +106,6 @@ namespace ks
 		// tree info
 		FSceneNode* Parent{ nullptr };
 		std::vector<FSceneNode*> Children;
-	};
-
-	struct FStaticMeshComponent
-	{
-		void SetStaticMesh(std::shared_ptr<FStaticMeshAsset> InAsset)
-		{ 
-			assert(InAsset);
-			StaticMeshAsset = InAsset;
-		}
-		FStaticMeshAsset* GetStaticMesh() { return StaticMeshAsset.get(); }
-		glm::mat4 GetWorldTrans() const { return ParentNode->GetWorldTrans(); }
-		std::shared_ptr<FStaticMeshAsset> StaticMeshAsset;
-		FSceneNode* ParentNode{nullptr};
 	};
 
 	class FCameraComponent
