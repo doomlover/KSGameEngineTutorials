@@ -31,6 +31,9 @@ namespace ks
 		PrimitiveConstBuffer = std::shared_ptr<TConstBuffer<FPrimitiveConstBufferParameter>>(
 			TConstBuffer<FPrimitiveConstBufferParameter>::CreateConstBuffer(ConstBufferParameter));
 		PrimitiveConstBuffer->GetRHIConstBuffer()->SetLocationIndex(0);
+
+		PrimitiveConstBuffer1.reset(GRHI->CreateConstBuffer1(&ConstBufferParameter, sizeof(FPrimitiveConstBufferParameter)));
+		PrimitiveConstBuffer1->SetLocationIndex(0);
 	}
 
 	/**********************************************************************/
@@ -55,9 +58,12 @@ namespace ks
 		glm::mat4 Eye2World{Camera->GetWorldTrans()};
 		ViewConstBufferParm.EyePos = Eye2World[3];
 
-		BasePassConstBuffer = std::shared_ptr<TConstBuffer<FViewConstBufferParameter>>(
+		/*BasePassConstBuffer = std::shared_ptr<TConstBuffer<FViewConstBufferParameter>>(
 			TConstBuffer<FViewConstBufferParameter>::CreateConstBuffer(ViewConstBufferParm));
-		BasePassConstBuffer->GetRHIConstBuffer()->SetLocationIndex(1);
+		BasePassConstBuffer->GetRHIConstBuffer()->SetLocationIndex(1);*/
+
+		BasePassConstBuffer1.reset(GRHI->CreateConstBuffer1(&ViewConstBufferParm, sizeof(FViewConstBufferParameter)));
+		BasePassConstBuffer1->SetLocationIndex(1);
 	}
 
 	void FRenderScene::AddPrimitive(FStaticMeshComponent* MeshComponent)

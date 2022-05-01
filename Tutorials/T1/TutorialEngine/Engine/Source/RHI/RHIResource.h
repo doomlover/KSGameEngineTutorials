@@ -67,7 +67,7 @@ namespace ks
 	{
 	public:
 		IRHIConstBuffer() = default;
-		virtual ~IRHIConstBuffer() {}
+		virtual ~IRHIConstBuffer() = 0 {}
 		virtual void UpdateData(const void* pData, uint32 Size) {
 			void* pDest = RHIResource->Map();
 			memcpy(pDest, pData, Size);
@@ -117,6 +117,9 @@ namespace ks
 		std::shared_ptr<IRHIBuffer> RHIBuffer;
 	};
 
+	/**************************************************************************************/
+	/**************************************************************************************/
+	/**************************************************************************************/
 	class IRHIConstBuffer1
 	{
 	public:

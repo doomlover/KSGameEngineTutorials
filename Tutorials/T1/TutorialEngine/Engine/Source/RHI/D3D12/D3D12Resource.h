@@ -1,6 +1,7 @@
 #pragma once
 #include "RHI/RHICommon.h"
 #include "RHI/D3D12/D3D12Common.h"
+#include "D3D12RHI.h"
 
 namespace ks::d3d12
 {
@@ -91,6 +92,9 @@ namespace ks::d3d12
 		D3D12_VERTEX_BUFFER_VIEW BufferView;
 	};
 
+	/**************************************************************************************/
+	/**************************************************************************************/
+	/**************************************************************************************/
 	class FD3D12Resource1
 	{
 	public:
@@ -101,13 +105,13 @@ namespace ks::d3d12
 		ComPtr<ID3D12Resource> D3D12Resource;
 	};
 
-	class FD3D12ConstBuffer1 : public IRHIConstBuffer, public FD3D12Resource1
+	class FD3D12ConstBuffer1 : public IRHIConstBuffer1, public FD3D12Resource1
 	{
 		friend class FD3D12RHI;
 	public:
-		FD3D12ConstBuffer1(uint32_t InSize);
+		FD3D12ConstBuffer1(uint32_t _Size);
 		virtual ~FD3D12ConstBuffer1();
-		virtual void SetData(const void* Data, uint32_t Size) /*override*/;
+		virtual void SetData(const void* Data, uint32_t Size) override;
 		const FDescriptorHandle& GetViewHandle() const { return ViewHandle; }
 		uint32_t GetAllocSize() const { return AllocSize; }
 	private:
@@ -116,7 +120,7 @@ namespace ks::d3d12
 		FDescriptorHandle ViewHandle;
 	};
 
-	class FD3D12IndexBuffer1 : public IRHIIndexBuffer, public FD3D12Resource1
+	class FD3D12IndexBuffer1 : public IRHIIndexBuffer1, public FD3D12Resource1
 	{
 		friend class FD3D12RHI;
 	public:
@@ -127,7 +131,7 @@ namespace ks::d3d12
 		D3D12_INDEX_BUFFER_VIEW BufferView;
 	};
 
-	class FD3D12VertexBuffer1 : public IRHIVertexBuffer, public FD3D12Resource1
+	class FD3D12VertexBuffer1 : public IRHIVertexBuffer1, public FD3D12Resource1
 	{
 		friend class FD3D12RHI;
 	public:

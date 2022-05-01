@@ -1,15 +1,11 @@
 #pragma once
 #include "RHICommon.h"
 #include "RHI/RHIPipelineStateDesc.h"
+#include "RHIResource.h"
 
 namespace ks
 {
-	class IRHIResource;
-	class IRHIBuffer;
-	class IRHIConstBuffer;
 	class IRHIPipelineState;
-	class IRHIVertexBuffer;
-	class IRHIIndexBuffer;
 
 	class IRHI
 	{
@@ -23,10 +19,12 @@ namespace ks
 		virtual void BeginFrame() = 0;
 		virtual void EndFrame() = 0;
 		virtual IRHIConstBuffer* CreateConstBuffer(const void* Data, uint32 Size) = 0;
+		virtual IRHIConstBuffer1* CreateConstBuffer1(const void* Data, uint32 Size) = 0;
 		virtual IRHIBuffer* CreateBuffer(uint32 Size, const void* Data) = 0;
 		virtual void SetPipelineState(IRHIPipelineState* PipelineState) = 0;
 		virtual IRHIPipelineState* CreatePipelineState(const FRHIPipelineStateDesc& Desc) = 0;
 		virtual void SetShaderConstBuffer(IRHIConstBuffer* ConstBuffer) = 0;
+		virtual void SetConstBuffer(IRHIConstBuffer1* ConstBuffer) = 0;
 		virtual void SetVertexBuffer(const IRHIVertexBuffer* VertexBuffer) = 0;
 		virtual void SetVertexBuffers(const IRHIVertexBuffer** VertexBuffers, int32 Num) = 0;
 		virtual IRHIVertexBuffer* CreateVertexBuffer(uint32 Stride, uint32 Size, const void* Data) = 0;

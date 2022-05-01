@@ -22,13 +22,15 @@ namespace ks
 		GRHI->SetPipelineState(RHIPipelineState.get());
 		
 		// bind pass shader parameter
-		GRHI->SetShaderConstBuffer(Renderer->RenderScene->BasePassConstBuffer->GetRHIConstBuffer());
+		//GRHI->SetShaderConstBuffer(Renderer->RenderScene->BasePassConstBuffer->GetRHIConstBuffer());
+		GRHI->SetConstBuffer(Renderer->RenderScene->BasePassConstBuffer1.get());
 		
 		// bind primitive shader parameter
 		for (int32 i{0}; i < Renderer->RenderScene->Primitives.size(); ++i)
 		{
 			FRenderPrimitive* Prim = Renderer->RenderScene->Primitives.at(i).get();
-			GRHI->SetShaderConstBuffer(Prim->GetPrimitiveConstBuffer()->GetRHIConstBuffer());
+			//GRHI->SetShaderConstBuffer(Prim->GetPrimitiveConstBuffer()->GetRHIConstBuffer());
+			GRHI->SetConstBuffer(Prim->GetConstBuffer());
 
 			// set vertex input
 			const FMeshRenderData* MeshRenderData{ Prim->GetRenderData() };

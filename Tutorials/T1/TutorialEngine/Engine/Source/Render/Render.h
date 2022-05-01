@@ -33,12 +33,14 @@ namespace ks
 		using ConstBufferPtrType = ConstBufferType::PtrType;
 		FRenderPrimitive(FStaticMeshComponent* MeshComponent);
 		ConstBufferPtrType GetPrimitiveConstBuffer() { return PrimitiveConstBuffer.get(); }
+		IRHIConstBuffer1* GetConstBuffer() { return PrimitiveConstBuffer1.get(); }
 		const FMeshRenderData* GetRenderData() const { return RenderData; }
 	private:
 		// reference FStaticMeshAsset::RenderData
 		FMeshRenderData* RenderData{nullptr};
 		// primitive constant buffer
 		std::shared_ptr<ConstBufferType> PrimitiveConstBuffer;
+		std::shared_ptr<IRHIConstBuffer1> PrimitiveConstBuffer1;
 		// bounds
 		FBounds Bounds{};
 	};
@@ -58,6 +60,7 @@ namespace ks
 		std::vector<std::unique_ptr<FRenderPrimitive>> Primitives;
 		// base pass const buffer
 		std::shared_ptr<TConstBuffer<FViewConstBufferParameter>> BasePassConstBuffer;
+		std::shared_ptr<IRHIConstBuffer1> BasePassConstBuffer1;
 	};
 	/**********************************************************************/
 

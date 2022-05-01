@@ -55,10 +55,12 @@ namespace ks::d3d12
 		virtual void BeginFrame() override;
 		virtual void EndFrame() override;
 		virtual IRHIConstBuffer* CreateConstBuffer(const void* Data, uint32 Size) override;
+		virtual IRHIConstBuffer1* CreateConstBuffer1(const void* Data, uint32 Size) override;
 		virtual IRHIBuffer* CreateBuffer(uint32 Size, const void* Data) override;
 		virtual void SetPipelineState(IRHIPipelineState* PipelineState) override;
 		virtual IRHIPipelineState* CreatePipelineState(const FRHIPipelineStateDesc& Desc) override;
 		virtual void SetShaderConstBuffer(IRHIConstBuffer* ConstBuffer) override;
+		virtual void SetConstBuffer(IRHIConstBuffer1* ConstBuffer) override;
 		virtual void SetVertexBuffer(const IRHIVertexBuffer* VertexBuffer) override;
 		virtual void SetVertexBuffers(const IRHIVertexBuffer** VertexBuffers, int32 Num) override;
 		virtual IRHIVertexBuffer* CreateVertexBuffer(uint32 Stride, uint32 Size, const void* Data) override;
@@ -72,6 +74,8 @@ namespace ks::d3d12
 		DXGI_FORMAT GetBackbufferFormat() const { return BackBufferFormat; }
 		DXGI_FORMAT GetDepthbufferFormat() const { return DepthBufferFormat; }
 		ID3D12RootSignature* GetGlobalRootSignature() { return GlobalRootSignature.Get(); }
+	private:
+		ID3D12Resource* _CreateBuffer(uint32_t Size, D3D12_HEAP_TYPE HeapType, D3D12_RESOURCE_STATES ResStats);
 	private:
 		HWND hWnd;
 		ComPtr<IDXGIFactory7> DXGIFactory;

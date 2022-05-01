@@ -115,6 +115,9 @@
     <ClCompile Include="Source\Core\Asset\MaterialAsset.cpp" />
     <ClCompile Include="Source\Core\Asset\AssetManager.cpp" />
     <ClCompile Include="Source\Core\Component\MeshComponent.cpp" />
+    <ClCompile Include="Source\RHI\D3D12\D3D12Resource.cpp">
+      <Filter>Source\Public\RHI\D3D12</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\engine_pch.h">

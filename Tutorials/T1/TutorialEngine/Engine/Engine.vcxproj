@@ -200,6 +200,7 @@
     </ClCompile>
     <ClCompile Include="Source\Render\MeshRenderData.cpp" />
     <ClCompile Include="Source\Render\Render.cpp" />
+    <ClCompile Include="Source\RHI\D3D12\D3D12Resource.cpp" />
     <ClCompile Include="Source\RHI\D3D12\D3D12RHI.cpp" />
     <ClCompile Include="Source\RHI\RHI.cpp" />
   </ItemGroup>

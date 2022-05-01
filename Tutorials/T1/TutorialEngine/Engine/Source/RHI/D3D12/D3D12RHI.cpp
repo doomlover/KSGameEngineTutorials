@@ -113,7 +113,7 @@ namespace ks::d3d12
 {
 namespace
 {
-	uint32 CalcConstantBufferByteSize(uint32 byteSize) {
+	inline uint32 CalcConstantBufferByteSize(uint32 byteSize) {
 		// Constant buffers must be a multiple of the minimum hardware
 		// allocation size (usually 256 bytes).  So round up to nearest
 		// multiple of 256.  We do this by adding 255 and then masking off
@@ -680,5 +680,47 @@ namespace ks::d3d12
 		D3D12GfxCommandList->DrawIndexedInstanced(IndexCount, 1, 0, 0, 0);
 	}
 
+	IRHIConstBuffer1* FD3D12RHI::CreateConstBuffer1(const void* Data, uint32 Size)
+	{
+		uint32_t AllocSize = CalcConstantBufferByteSize(Size);
+		FD3D12ConstBuffer1* ConstBuffer = new FD3D12ConstBuffer1(AllocSize);
+		ConstBuffer->D3D12Resource = _CreateBuffer(AllocSize, D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_GENERIC_READ);
+		ConstBuffer->D3D12Resource->Map(0, nullptr, &ConstBuffer->MapData);
+		ConstBuffer->SetData(Data, Size);
+		ConstBuffer->ViewHandle = CBVHeap.Allocate();
+
+		D3D12_CONSTANT_BUFFER_VIEW_DESC desc{};
+		desc.BufferLocation = ConstBuffer->D3D12Resource->GetGPUVirtualAddress();
+		desc.SizeInBytes = AllocSize;
+		GD3D12Device->CreateConstantBufferView(&desc, ConstBuffer->ViewHandle.CpuHandle);
+		return ConstBuffer;
+	}
+
+	ID3D12Resource* FD3D12RHI::_CreateBuffer(uint32_t Size, D3D12_HEAP_TYPE HeapType, D3D12_RESOURCE_STATES ResStats)
+	{
+		ID3D12Resource* D3D12Resource{nullptr};
+		CD3DX12_HEAP_PROPERTIES HeapProp(HeapType);
+		CD3DX12_RESOURCE_DESC ResDesc = CD3DX12_RESOURCE_DESC::Buffer(Size);
+		KS_D3D12_CALL(GD3D12Device->CreateCommittedResource(
+			&HeapProp,
+			D3D12_HEAP_FLAG_NONE,
+			&ResDesc,
+			ResStats,
+			nullptr,
+			IID_PPV_ARGS(&D3D12Resource)
+		));
+		return D3D12Resource;
+	}
+
+	void FD3D12RHI::SetConstBuffer(IRHIConstBuffer1* ConstBuffer)
+	{
+		assert(ConstBuffer);
+		FD3D12ConstBuffer1* D3D12ConstBuffer = dynamic_cast<FD3D12ConstBuffer1*>(ConstBuffer);
+		assert(D3D12ConstBuffer);
+		const FDescriptorHandle& ViewHandle = D3D12ConstBuffer->GetViewHandle();
+		D3D12GfxCommandList->SetGraphicsRootDescriptorTable(static_cast<UINT>(ConstBuffer->GetLocationIndex()), ViewHandle.GpuHandle);
+	}
+
 }
+
 
