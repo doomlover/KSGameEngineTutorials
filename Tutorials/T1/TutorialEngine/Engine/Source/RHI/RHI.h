@@ -101,12 +101,12 @@ namespace ks
 	class IRHIIndexBuffer
 	{
 	public:
-		IRHIIndexBuffer(EELEM_FORMAT InElemFormat, uint32 InStride, uint32 InSize):ElemFormat(InElemFormat),Stride(InStride),Size(InSize){}
+		IRHIIndexBuffer(EELEM_FORMAT InElemFormat, uint32 _Count, uint32 InSize):ElemFormat(InElemFormat),Count(_Count),Size(InSize){}
 		virtual ~IRHIIndexBuffer(){}
-		uint32 GetIndexCount() const { return Size / Stride; }
+		uint32 GetIndexCount() const { return Count; }
 	protected:
-		EELEM_FORMAT ElemFormat{ EELEM_FORMAT::INVALID };
-		uint32 Stride{0};
+		EELEM_FORMAT ElemFormat{ EELEM_FORMAT::UNKNOWN };
+		uint32 Count{0};
 		uint32 Size{0};
 		std::shared_ptr<IRHIBuffer> RHIBuffer;
 	};

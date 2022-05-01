@@ -657,9 +657,9 @@ namespace ks::d3d12
 		return D3D12VertBuffer;
 	}
 
-	ks::IRHIIndexBuffer* FD3D12RHI::CreateIndexBuffer(EELEM_FORMAT ElemFormat, uint32 Stride, uint32 Size, const void* Data)
+	ks::IRHIIndexBuffer* FD3D12RHI::CreateIndexBuffer(EELEM_FORMAT ElemFormat, uint32 Count, uint32 Size, const void* Data)
 	{
-		FD3D12IndexBuffer* IndexBuffer = new FD3D12IndexBuffer(ElemFormat, Stride, Size);
+		FD3D12IndexBuffer* IndexBuffer = new FD3D12IndexBuffer(ElemFormat, Count, Size);
 		IndexBuffer->RHIBuffer = std::shared_ptr<IRHIBuffer>(CreateBuffer(Size, Data));
 		auto D3D12Buffer{std::dynamic_pointer_cast<FD3D12Buffer>(IndexBuffer->RHIBuffer)};
 		IndexBuffer->BufferView.BufferLocation = D3D12Buffer->GetD3D12Resource()->GetID3D12Resource()->GetGPUVirtualAddress();

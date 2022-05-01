@@ -58,7 +58,7 @@ namespace ks
 		R16_UINT,
 		R32G32B32_FLOAT,
 		R32G32B32A32_FLOAT,
-		INVALID,
+		UNKNOWN,
 	};
 
 namespace util
@@ -72,6 +72,8 @@ namespace util
 	inline size_t GetStride(const EELEM_TYPE& ElemType, const EDATA_TYPE& DataType) {
 		return GetElemNum(ElemType) * GetDataTypeSize(DataType);
 	}
+
+	uint32_t GetElemFormatSize(EELEM_FORMAT ElemFormat);
 
 	std::string GetContentPath(const std::string& Path);
 

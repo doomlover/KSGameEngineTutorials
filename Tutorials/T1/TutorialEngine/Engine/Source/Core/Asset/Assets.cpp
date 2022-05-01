@@ -276,15 +276,19 @@ namespace ks {
 
 				// load index buffer
 				{
-					std::vector<uint8> RawData;
-					const auto& Accessor = gltf::GetAccessor(Scene, Primitive.indices);
-					MeshData.IndexDataType = static_cast<EDATA_TYPE>(Accessor.componentType);
-					gltf::CopyRawData(Scene, Accessor, MeshData.IndexRawData);
-					if (MeshData.IndexDataType == EDATA_TYPE::BYTE ||
-						MeshData.IndexDataType == EDATA_TYPE::UNSIGNED_BYTE)
+					FRawAttributeData MeshIndexData;
+					MeshIndexData.Name = "indices";
+					gltf::CopyRawDataByAccessor(MeshIndexData, Scene, Primitive.indices);
+					MeshData.IndexData.Count = MeshIndexData.Count;
+					MeshData.IndexData.Stride = static_cast<uint32_t>(MeshIndexData.GetStride());
+					MeshData.IndexData.DataType = MeshIndexData.DataType;
+					MeshData.IndexData.Data = std::move(MeshIndexData.Data);
+					auto& IndexData{MeshData.IndexData};
+					if(IndexData.DataType == EDATA_TYPE::BYTE ||
+					   IndexData.DataType == EDATA_TYPE::UNSIGNED_BYTE)
 					{
-						auto& IndexRawData{MeshData.IndexRawData};
-						MeshData.IndexDataType = EDATA_TYPE::UNSIGNED_SHORT;
+						auto& IndexRawData{IndexData.Data};
+						IndexData.DataType = EDATA_TYPE::UNSIGNED_SHORT;
 						std::vector<uint16> RawData(IndexRawData.size());
 						for (int32 i{0}; i < IndexRawData.size(); ++i)
 						{
@@ -301,6 +305,7 @@ namespace ks {
 					gltf::CopyRawDataByAccessor(MeshPositionData, Scene, Primitive.attributes.at(MeshPositionData.Name));
 					MeshData.PositionData.Count = MeshPositionData.Count;
 					MeshData.PositionData.Stride = static_cast<uint32>(MeshPositionData.GetStride());
+					MeshData.PositionData.DataType = MeshPositionData.DataType;
 					MeshData.PositionData.Data = std::move(MeshPositionData.Data);
 					const auto& Accessor = GetAccessor(Scene, Primitive.attributes.at(MeshPositionData.Name));
 					memcpy(&MeshData.Min.x, Accessor.min.data(), Accessor.min.size() * sizeof(float));
@@ -344,6 +349,7 @@ namespace ks {
 
 					MeshData.AttributeData.Count = ElemCount;
 					MeshData.AttributeData.Stride = static_cast<uint32>(Stride);
+					MeshData.AttributeData.DataType = AttriDataAry.begin()->DataType;
 					MeshData.AttributeData.Data = std::move(Data);
 				}
 				// load material data

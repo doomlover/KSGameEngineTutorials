@@ -11,6 +11,7 @@ namespace ks {
 	{
 		uint32 Count{0};
 		uint32 Stride{0};
+		EDATA_TYPE DataType{EDATA_TYPE::INVALID};
 		std::vector<uint8> Data;
 		FMeshAttributeData() = default;
 		FMeshAttributeData(const FMeshAttributeData& Other) {
@@ -19,6 +20,7 @@ namespace ks {
 		FMeshAttributeData& operator=(const FMeshAttributeData& Other) {
 			Count = Other.Count;
 			Stride = Other.Stride;
+			DataType = Other.DataType;
 			Data = Other.Data;
 			return *this;
 		}
@@ -28,6 +30,7 @@ namespace ks {
 		FMeshAttributeData& operator=(FMeshAttributeData&& Tmp) noexcept {
 			Count = Tmp.Count;
 			Stride = Tmp.Stride;
+			DataType = Tmp.DataType;
 			Data = std::move(Tmp.Data);
 			return *this;
 		}
@@ -40,6 +43,7 @@ namespace ks {
 		// indices
 		EDATA_TYPE IndexDataType{EDATA_TYPE::INVALID};
 		std::vector<uint8> IndexRawData;
+		FMeshAttributeData IndexData;
 		// positions
 		FMeshAttributeData PositionData;
 		// other attributes include normal, texcoord, etc
@@ -59,6 +63,7 @@ namespace ks {
 			KeyName = Other.KeyName;
 			IndexDataType = Other.IndexDataType;
 			IndexRawData = Other.IndexRawData;
+			IndexData = Other.IndexData;
 			PositionData = Other.PositionData;
 			AttributeData = Other.AttributeData;
 			MaterialData = Other.MaterialData;
@@ -71,6 +76,7 @@ namespace ks {
 			KeyName = std::move(Tmp.KeyName);
 			IndexDataType = Tmp.IndexDataType;
 			IndexRawData = std::move(Tmp.IndexRawData);
+			IndexData = std::move(Tmp.IndexData);
 			PositionData = std::move(Tmp.PositionData);
 			AttributeData = std::move(Tmp.AttributeData);
 			MaterialData = std::move(Tmp.MaterialData);

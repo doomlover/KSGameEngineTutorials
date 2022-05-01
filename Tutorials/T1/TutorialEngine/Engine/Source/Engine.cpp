@@ -157,7 +157,20 @@ namespace util
 			break;
 		}
 		assert(false);
-		return EELEM_FORMAT::INVALID;
+		return EELEM_FORMAT::UNKNOWN;
+	}
+
+	uint32_t GetElemFormatSize(EELEM_FORMAT ElemFormat)
+	{
+		static const std::unordered_map<EELEM_FORMAT, uint32_t> FormatSizeMap = {
+			{EELEM_FORMAT::R16_INT,		2},
+			{EELEM_FORMAT::R16_UINT,	2},
+			{EELEM_FORMAT::R8_INT,		1},
+			{EELEM_FORMAT::R8_UINT,		1},
+			{EELEM_FORMAT::R32G32B32_FLOAT,		12},
+			{EELEM_FORMAT::R32G32B32A32_FLOAT,	16},
+		};
+		return FormatSizeMap.at(ElemFormat);
 	}
 
 	size_t GetDataTypeSize(EDATA_TYPE DataType)

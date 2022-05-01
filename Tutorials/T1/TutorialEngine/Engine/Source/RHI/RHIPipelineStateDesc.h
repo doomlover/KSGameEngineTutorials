@@ -8,7 +8,7 @@ namespace ks
 	{
 		std::string SemanticName{};
 		int32 SemanticIndex{-1};
-		EELEM_FORMAT ElemFormat{EELEM_FORMAT::INVALID};
+		EELEM_FORMAT ElemFormat{EELEM_FORMAT::UNKNOWN};
 		int32 InputSlot{-1};
 		int32 Stride{0};
 	};

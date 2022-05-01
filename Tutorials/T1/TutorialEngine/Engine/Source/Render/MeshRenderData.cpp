@@ -18,11 +18,10 @@ namespace
 	{
 		{
 			assert(!RHIIndexBuffer);
-			EELEM_FORMAT ElemFormat = util::GetElemFormat(MeshData.IndexDataType, EELEM_TYPE::SCALAR);
-			uint32 Stride = static_cast<uint32>(util::GetDataTypeSize(MeshData.IndexDataType));
-			const uint32 Size{static_cast<uint32>(MeshData.IndexRawData.size())};
-
-			IRHIIndexBuffer* _RHIBuffer = GRHI->CreateIndexBuffer(ElemFormat, Stride, Size, MeshData.IndexRawData.data());
+			EELEM_FORMAT ElemFormat = util::GetElemFormat(MeshData.IndexData.DataType, EELEM_TYPE::SCALAR);
+			const auto& Count{MeshData.IndexData.Count};
+			const uint32_t Size{static_cast<uint32_t>(MeshData.IndexData.Data.size())};
+			IRHIIndexBuffer* _RHIBuffer = GRHI->CreateIndexBuffer(ElemFormat, Count, Size, MeshData.IndexData.Data.data());
 			RHIIndexBuffer.reset(_RHIBuffer);
 		}
 
