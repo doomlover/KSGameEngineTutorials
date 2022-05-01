@@ -125,7 +125,7 @@ namespace ks::d3d12
 	{
 		friend class FD3D12RHI;
 	public:
-		FD3D12IndexBuffer1(EELEM_FORMAT InElemFormat, uint32 InCount, uint32 InSize);
+		FD3D12IndexBuffer1(EELEM_FORMAT _ElemFormat, uint32 _Count, uint32 _Size);
 		virtual ~FD3D12IndexBuffer1() {}
 		const D3D12_INDEX_BUFFER_VIEW& GetIndexBufferView() const { return BufferView; }
 	private:

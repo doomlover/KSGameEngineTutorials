@@ -13,14 +13,20 @@ namespace ks
 	void FMeshRenderData::InitRHI()
 	{
 		{
-			assert(!RHIIndexBuffer);
 			EELEM_FORMAT ElemFormat = util::GetElemFormat(MeshData.IndexData.DataType, EELEM_TYPE::SCALAR);
 			const auto& Count{MeshData.IndexData.Count};
 			const uint32_t Size{static_cast<uint32_t>(MeshData.IndexData.Data.size())};
+#if RHIINDEXBUFFER_V1
+			assert(!RHIIndexBuffer1);
+			IRHIIndexBuffer1* IndexBuffer = GRHI->CreateIndexBuffer1(ElemFormat, Count, Size, MeshData.IndexData.Data.data());
+			RHIIndexBuffer1.reset(IndexBuffer);
+#else
+			assert(!RHIIndexBuffer);
 			IRHIIndexBuffer* _RHIBuffer = GRHI->CreateIndexBuffer(ElemFormat, Count, Size, MeshData.IndexData.Data.data());
 			RHIIndexBuffer.reset(_RHIBuffer);
+#endif
 		}
-#if !RHIRESOURCE_V1
+#if !RHIVERTBUFFER_V1
 		auto CreateRHIVertBuffer = [](const FMeshAttributeData& MeshAttriData, std::unique_ptr<IRHIVertexBuffer>& RHIVertBuffer) {
 			assert(!RHIVertBuffer);
 			const uint32& Stride { MeshAttriData.Stride };

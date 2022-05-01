@@ -31,8 +31,10 @@ namespace ks
 		virtual void SetVertexBuffers1(const IRHIVertexBuffer1** VertexBuffers, int32 Num) = 0;
 		virtual IRHIVertexBuffer* CreateVertexBuffer(uint32 Stride, uint32 Size, const void* Data) = 0;
 		virtual IRHIVertexBuffer1* CreateVertexBuffer1(uint32 Stride, uint32 Size, const void* Data) = 0;
-		virtual IRHIIndexBuffer* CreateIndexBuffer(EELEM_FORMAT ElemFormat, uint32 Stride, uint32 Size, const void* Data) = 0;
+		virtual IRHIIndexBuffer* CreateIndexBuffer(EELEM_FORMAT ElemFormat, uint32 Count, uint32 Size, const void* Data) = 0;
+		virtual IRHIIndexBuffer1* CreateIndexBuffer1(EELEM_FORMAT ElemFormat, uint32 Count, uint32 Size, const void* Data) = 0;
 		virtual void DrawIndexedPrimitive(const IRHIIndexBuffer* IndexBuffer) = 0;
+		virtual void DrawIndexedPrimitive1(const IRHIIndexBuffer1* IndexBuffer) = 0;
 	};
 
 	extern IRHI* GRHI;

@@ -59,7 +59,9 @@ namespace ks::d3d12
 		virtual IRHIVertexBuffer* CreateVertexBuffer(uint32 Stride, uint32 Size, const void* Data) override;
 		virtual IRHIVertexBuffer1* CreateVertexBuffer1(uint32 Stride, uint32 Size, const void* Data) override;
 		virtual IRHIIndexBuffer* CreateIndexBuffer(EELEM_FORMAT ElemFormat, uint32 Count, uint32 Size, const void* Data) override;
+		virtual IRHIIndexBuffer1* CreateIndexBuffer1(EELEM_FORMAT ElemFormat, uint32 Count, uint32 Size, const void* Data) override;
 		virtual void DrawIndexedPrimitive(const IRHIIndexBuffer* IndexBuffer) override;
+		virtual void DrawIndexedPrimitive1(const IRHIIndexBuffer1* IndexBuffer) override;
 		// static helper functions
 		static d3d12::FD3D12Resource* CreateConstBufferResource(size_t Size);
 		// d3d12 interface

@@ -39,7 +39,7 @@ namespace ks
 #endif
 			// set vertex input
 			const FMeshRenderData* MeshRenderData{ Prim->GetRenderData() };
-#if !RHIRESOURCE_V1
+#if !RHIVERTBUFFER_V1
 			const IRHIVertexBuffer* VertexBuffers[] = {MeshRenderData->GetRHIVertexBuffer(), MeshRenderData->GetRHIAttrBuffer()};
 			GRHI->SetVertexBuffers(VertexBuffers, _countof(VertexBuffers));
 #else
@@ -47,8 +47,13 @@ namespace ks
 			GRHI->SetVertexBuffers1(VertexBuffers1, _countof(VertexBuffers1));
 #endif
 			// set index buffer and draw primitives
+#if RHIINDEXBUFFER_V1
+			const IRHIIndexBuffer1* IndexBuffer{ MeshRenderData->GetRHIIndexBuffer1() };
+			GRHI->DrawIndexedPrimitive1(IndexBuffer);
+#else
 			const IRHIIndexBuffer* IndexBuffer{ MeshRenderData->GetRHIIndexBuffer() };
 			GRHI->DrawIndexedPrimitive(IndexBuffer);
+#endif
 		}
 		// end
 	}

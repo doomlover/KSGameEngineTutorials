@@ -1,7 +1,8 @@
 #pragma once
 
 #define RHICONSTBUFFER_V1 1
-#define RHIRESOURCE_V1 1
+#define RHIVERTBUFFER_V1 1
+#define RHIINDEXBUFFER_V1 1
 
 namespace ks
 {
@@ -138,9 +139,9 @@ namespace ks
 	class IRHIIndexBuffer1
 	{
 	public:
-		IRHIIndexBuffer1(EELEM_FORMAT InElemFormat, uint32 InCount, uint32 InSize) :ElemFormat(InElemFormat), Count(InCount), Size(InSize) {}
+		IRHIIndexBuffer1(EELEM_FORMAT _ElemFormat, uint32 _Count, uint32 _Size) :ElemFormat(_ElemFormat), Count(_Count), Size(_Size) {}
 		virtual ~IRHIIndexBuffer1() = 0 {}
-		uint32 GetIndexCount() const { return Count; }
+		uint32 GetCount() const { return Count; }
 	protected:
 		EELEM_FORMAT ElemFormat{EELEM_FORMAT::UNKNOWN};
 		uint32 Count{0};

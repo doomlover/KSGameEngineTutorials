@@ -10,8 +10,12 @@ namespace ks
 	{
 	public:
 		FMeshRenderData(const FMeshData& _MeshData);
+#if RHIINDEXBUFFER_V1
+		const IRHIIndexBuffer1* GetRHIIndexBuffer1() const { return RHIIndexBuffer1.get(); }
+#else
 		const IRHIIndexBuffer* GetRHIIndexBuffer() const { return RHIIndexBuffer.get(); }
-#if !RHIRESOURCE_V1
+#endif
+#if !RHIVERTBUFFER_V1
 		const IRHIVertexBuffer* GetRHIVertexBuffer() const { return RHIVertBuffer.get(); }
 		const IRHIVertexBuffer* GetRHIAttrBuffer() const { return RHIAttrBuffer.get(); }
 #else
@@ -21,8 +25,12 @@ namespace ks
 	private:
 		void InitRHI();
 		const FMeshData& MeshData;
+#if RHIINDEXBUFFER_V1
+		std::unique_ptr<IRHIIndexBuffer1> RHIIndexBuffer1;
+#else
 		std::unique_ptr<IRHIIndexBuffer> RHIIndexBuffer;
-#if !RHIRESOURCE_V1
+#endif
+#if !RHIVERTBUFFER_V1
 		std::unique_ptr<IRHIVertexBuffer> RHIVertBuffer;
 		std::unique_ptr<IRHIVertexBuffer> RHIAttrBuffer;
 #else

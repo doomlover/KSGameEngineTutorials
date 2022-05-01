@@ -788,6 +788,31 @@ namespace ks::d3d12
 		}
 	}
 
+	IRHIIndexBuffer1* FD3D12RHI::CreateIndexBuffer1(EELEM_FORMAT ElemFormat, uint32 Count, uint32 Size, const void* Data)
+	{
+		FD3D12IndexBuffer1* IndexBuffer = new FD3D12IndexBuffer1(ElemFormat, Count, Size);
+		IndexBuffer->D3D12Resource = _CreateBuffer(Size, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_COMMON);
+		IndexBuffer->BufferView.BufferLocation = IndexBuffer->D3D12Resource->GetGPUVirtualAddress();
+		IndexBuffer->BufferView.Format = d3d12::GetDXGIFormat(ElemFormat);
+		IndexBuffer->BufferView.SizeInBytes = Size;
+		if (Data)
+		{
+			int32_t error = UploadResourceData(IndexBuffer->D3D12Resource.Get(), Data, Size);
+			assert(!error);
+		}
+		return IndexBuffer;
+	}
+
+	void FD3D12RHI::DrawIndexedPrimitive1(const IRHIIndexBuffer1* _IndexBuffer)
+	{
+		const FD3D12IndexBuffer1* IndexBuffer{ dynamic_cast<const FD3D12IndexBuffer1*>(_IndexBuffer) };
+		const D3D12_INDEX_BUFFER_VIEW IndexBufferView{ IndexBuffer->GetIndexBufferView() };
+		D3D12GfxCommandList->IASetIndexBuffer(&IndexBufferView);
+
+		const UINT IndexCount{ IndexBuffer->GetCount() };
+		D3D12GfxCommandList->DrawIndexedInstanced(IndexCount, 1, 0, 0, 0);
+	}
+
 }
 
 
