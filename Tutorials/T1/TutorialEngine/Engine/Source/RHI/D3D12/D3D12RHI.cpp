@@ -82,10 +82,10 @@ namespace ks::d3d12
 		return Handle;
 	}
 
-	class FCommandListRecordHelper
+	class FScopedCommandRecorder
 	{
 	public:
-		FCommandListRecordHelper(
+		FScopedCommandRecorder(
 			ID3D12GraphicsCommandList* InGfxCommandList,
 			ID3D12CommandAllocator* InCommandAllocator,
 			ID3D12CommandQueue* InCommandQueue)
@@ -95,7 +95,7 @@ namespace ks::d3d12
 		{
 			KS_D3D12_CALL(GfxCommandList->Reset(CommandAllocator, nullptr));
 		}
-		~FCommandListRecordHelper() {
+		~FScopedCommandRecorder() {
 			// Done recording commands.
 			KS_D3D12_CALL(GfxCommandList->Close());
 			// Add the command list to the queue for execution.
@@ -564,7 +564,7 @@ namespace ks::d3d12
 
 		assert(Data);
 		if (Data) {
-			FCommandListRecordHelper CommandListRecordHelper(D3D12GfxCommandList.Get(), D3D12CommandAllocator.Get(), D3D12CommandQueue.Get());
+			FScopedCommandRecorder CommandListRecordHelper(D3D12GfxCommandList.Get(), D3D12CommandAllocator.Get(), D3D12CommandQueue.Get());
 
 			ID3D12Resource* UploadBuffer = dynamic_cast<d3d12::FD3D12Resource*>(_RHIBuffer->UploadResource.get())->GetID3D12Resource();
 			ID3D12Resource* DefaultBuffer = dynamic_cast<d3d12::FD3D12Resource*>(_RHIBuffer->RHIResource.get())->GetID3D12Resource();
@@ -719,6 +719,73 @@ namespace ks::d3d12
 		assert(D3D12ConstBuffer);
 		const FDescriptorHandle& ViewHandle = D3D12ConstBuffer->GetViewHandle();
 		D3D12GfxCommandList->SetGraphicsRootDescriptorTable(static_cast<UINT>(ConstBuffer->GetLocationIndex()), ViewHandle.GpuHandle);
+	}
+
+	ks::IRHIVertexBuffer1* FD3D12RHI::CreateVertexBuffer1(uint32 Stride, uint32 Size, const void* Data)
+	{
+		FD3D12VertexBuffer1* VertBuffer = new FD3D12VertexBuffer1(Stride, Size);
+		VertBuffer->D3D12Resource = _CreateBuffer(Size, D3D12_HEAP_TYPE_DEFAULT, D3D12_RESOURCE_STATE_COMMON);
+		VertBuffer->BufferView.BufferLocation = VertBuffer->D3D12Resource->GetGPUVirtualAddress();
+		VertBuffer->BufferView.StrideInBytes = Stride;
+		VertBuffer->BufferView.SizeInBytes = Size;
+		if (Data)
+		{
+			UploadResourceData(VertBuffer->D3D12Resource.Get(), Data, Size);
+		}
+		return VertBuffer;
+	}
+
+	int32_t FD3D12RHI::UploadResourceData(ID3D12Resource* DestResource, const void* Data, uint32_t Size)
+	{
+		assert(DestResource && Data && Size);
+		if (!DestResource || !Data || !Size)
+		{
+			return -1;
+		}
+		ComPtr<ID3D12Resource> UploadBufferPtr = _CreateBuffer(
+			Size, D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_GENERIC_READ);
+		ID3D12Resource* UploadBuffer{UploadBufferPtr.Get()};
+		ID3D12Resource* DefaultBuffer{DestResource};
+		{
+			FScopedCommandRecorder ScopedCmdRecorder(
+				D3D12GfxCommandList.Get(), D3D12CommandAllocator.Get(), D3D12CommandQueue.Get());
+			
+			// Schedule to copy the data to the default buffer resource.  At a high level, the helper function UpdateSubresources
+			// will copy the CPU memory into the intermediate upload heap.  Then, using ID3D12CommandList::CopySubresourceRegion,
+			// the intermediate upload heap data will be copied to mBuffer.
+			D3D12_SUBRESOURCE_DATA subResourceData = { Data, Size, Size };
+			{
+				CD3DX12_RESOURCE_BARRIER ResrcBarrier = CD3DX12_RESOURCE_BARRIER::Transition(DefaultBuffer,
+					D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_COPY_DEST);
+				D3D12GfxCommandList->ResourceBarrier(1, &ResrcBarrier);
+			}
+			UpdateSubresources<1>(D3D12GfxCommandList.Get(), DefaultBuffer, UploadBuffer, 0, 0, 1, &subResourceData);
+			{
+				CD3DX12_RESOURCE_BARRIER ResrcBarrier = CD3DX12_RESOURCE_BARRIER::Transition(DefaultBuffer,
+					D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_GENERIC_READ);
+				D3D12GfxCommandList->ResourceBarrier(1, &ResrcBarrier);
+			}
+		}
+		UploadBufferPtr->Release();
+		return 0;
+	}
+
+	void FD3D12RHI::SetVertexBuffer1(const IRHIVertexBuffer1* _VertexBuffer)
+	{
+		const FD3D12VertexBuffer1* VertexBuffer{ dynamic_cast<const FD3D12VertexBuffer1*>(_VertexBuffer) };
+		D3D12GfxCommandList->IASetVertexBuffers(0, 1, &VertexBuffer->GetVertexBufferView());
+	}
+
+	void FD3D12RHI::SetVertexBuffers1(const IRHIVertexBuffer1** VertexBuffers, int32 Num)
+	{
+		if (VertexBuffers && Num)
+		{
+			for (int32 i = 0; i < Num; ++i)
+			{
+				const FD3D12VertexBuffer1* VertexBuffer{ dynamic_cast<const FD3D12VertexBuffer1*>(VertexBuffers[i]) };
+				D3D12GfxCommandList->IASetVertexBuffers(i, 1, &VertexBuffer->GetVertexBufferView());
+			}
+		}
 	}
 
 }

@@ -19,6 +19,16 @@ using Microsoft::WRL::ComPtr;
 #endif // KS_DEBUG_BUILD
 namespace ks::d3d12
 {
+	extern ID3D12Device* GD3D12Device;
+	extern ID3D12GraphicsCommandList* GGfxCmdlist;
+
+	class FDescriptorHandle
+	{
+	public:
+		D3D12_CPU_DESCRIPTOR_HANDLE CpuHandle{};
+		D3D12_GPU_DESCRIPTOR_HANDLE GpuHandle{};
+	};
+
 	DXGI_FORMAT GetDXGIFormat(EELEM_FORMAT ElemFormat);
 }
 namespace ks::d3d12::Colors

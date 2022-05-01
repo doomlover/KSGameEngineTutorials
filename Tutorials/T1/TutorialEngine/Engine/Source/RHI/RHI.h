@@ -26,8 +26,11 @@ namespace ks
 		virtual void SetShaderConstBuffer(IRHIConstBuffer* ConstBuffer) = 0;
 		virtual void SetConstBuffer(IRHIConstBuffer1* ConstBuffer) = 0;
 		virtual void SetVertexBuffer(const IRHIVertexBuffer* VertexBuffer) = 0;
+		virtual void SetVertexBuffer1(const IRHIVertexBuffer1* VertexBuffer) = 0;
 		virtual void SetVertexBuffers(const IRHIVertexBuffer** VertexBuffers, int32 Num) = 0;
+		virtual void SetVertexBuffers1(const IRHIVertexBuffer1** VertexBuffers, int32 Num) = 0;
 		virtual IRHIVertexBuffer* CreateVertexBuffer(uint32 Stride, uint32 Size, const void* Data) = 0;
+		virtual IRHIVertexBuffer1* CreateVertexBuffer1(uint32 Stride, uint32 Size, const void* Data) = 0;
 		virtual IRHIIndexBuffer* CreateIndexBuffer(EELEM_FORMAT ElemFormat, uint32 Stride, uint32 Size, const void* Data) = 0;
 		virtual void DrawIndexedPrimitive(const IRHIIndexBuffer* IndexBuffer) = 0;
 	};

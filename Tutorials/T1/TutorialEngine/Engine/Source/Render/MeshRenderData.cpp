@@ -4,11 +4,6 @@
 
 namespace ks
 {
-namespace
-{
-	
-}
-
 	FMeshRenderData::FMeshRenderData(const FMeshData& _MeshData)
 		:MeshData(_MeshData)
 	{
@@ -25,7 +20,7 @@ namespace
 			IRHIIndexBuffer* _RHIBuffer = GRHI->CreateIndexBuffer(ElemFormat, Count, Size, MeshData.IndexData.Data.data());
 			RHIIndexBuffer.reset(_RHIBuffer);
 		}
-
+#if !RHIRESOURCE_V1
 		auto CreateRHIVertBuffer = [](const FMeshAttributeData& MeshAttriData, std::unique_ptr<IRHIVertexBuffer>& RHIVertBuffer) {
 			assert(!RHIVertBuffer);
 			const uint32& Stride { MeshAttriData.Stride };
@@ -37,6 +32,19 @@ namespace
 
 		CreateRHIVertBuffer(MeshData.PositionData, RHIVertBuffer);
 		CreateRHIVertBuffer(MeshData.AttributeData, RHIAttrBuffer);
+#else
+		auto CreateRHIVertBuffer = [](const FMeshAttributeData& MeshAttriData, std::unique_ptr<IRHIVertexBuffer1>& RHIVertBuffer) {
+			assert(!RHIVertBuffer);
+			const uint32& Stride{ MeshAttriData.Stride };
+			const uint32 Size{ Stride * MeshAttriData.Count };
+			const void* Data{ MeshAttriData.Data.data() };
+			IRHIVertexBuffer1* VertBuffer = GRHI->CreateVertexBuffer1(Stride, Size, Data);
+			RHIVertBuffer.reset(VertBuffer);
+		};
+
+		CreateRHIVertBuffer(MeshData.PositionData, RHIVertBuffer1);
+		CreateRHIVertBuffer(MeshData.AttributeData, RHIAttrBuffer1);
+#endif
 	}
 
 }

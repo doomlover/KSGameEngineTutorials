@@ -9,15 +9,6 @@ namespace ks::d3d12
 	class FD3D12RHI;
 
 	extern FD3D12RHI* GD3D12RHI;
-	extern ID3D12Device* GD3D12Device;
-	extern ID3D12GraphicsCommandList* GGfxCmdlist;
-
-	class FDescriptorHandle
-	{
-	public:
-		D3D12_CPU_DESCRIPTOR_HANDLE CpuHandle{};
-		D3D12_GPU_DESCRIPTOR_HANDLE GpuHandle{};
-	};
 
 	class FDescriptorHeap
 	{
@@ -62,8 +53,11 @@ namespace ks::d3d12
 		virtual void SetShaderConstBuffer(IRHIConstBuffer* ConstBuffer) override;
 		virtual void SetConstBuffer(IRHIConstBuffer1* ConstBuffer) override;
 		virtual void SetVertexBuffer(const IRHIVertexBuffer* VertexBuffer) override;
+		virtual void SetVertexBuffer1(const IRHIVertexBuffer1* VertexBuffer) override;
 		virtual void SetVertexBuffers(const IRHIVertexBuffer** VertexBuffers, int32 Num) override;
+		virtual void SetVertexBuffers1(const IRHIVertexBuffer1** VertexBuffers, int32 Num) override;
 		virtual IRHIVertexBuffer* CreateVertexBuffer(uint32 Stride, uint32 Size, const void* Data) override;
+		virtual IRHIVertexBuffer1* CreateVertexBuffer1(uint32 Stride, uint32 Size, const void* Data) override;
 		virtual IRHIIndexBuffer* CreateIndexBuffer(EELEM_FORMAT ElemFormat, uint32 Count, uint32 Size, const void* Data) override;
 		virtual void DrawIndexedPrimitive(const IRHIIndexBuffer* IndexBuffer) override;
 		// static helper functions
@@ -76,6 +70,7 @@ namespace ks::d3d12
 		ID3D12RootSignature* GetGlobalRootSignature() { return GlobalRootSignature.Get(); }
 	private:
 		ID3D12Resource* _CreateBuffer(uint32_t Size, D3D12_HEAP_TYPE HeapType, D3D12_RESOURCE_STATES ResStats);
+		int32_t UploadResourceData(ID3D12Resource* DestResource, const void* Data, uint32_t Size);
 	private:
 		HWND hWnd;
 		ComPtr<IDXGIFactory7> DXGIFactory;

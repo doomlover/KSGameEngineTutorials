@@ -1,7 +1,6 @@
 #pragma once
 #include "RHI/RHICommon.h"
 #include "RHI/D3D12/D3D12Common.h"
-#include "D3D12RHI.h"
 
 namespace ks::d3d12
 {
@@ -99,7 +98,9 @@ namespace ks::d3d12
 	{
 	public:
 		FD3D12Resource1() = default;
-		virtual ~FD3D12Resource1() = 0 {}
+		virtual ~FD3D12Resource1() = 0 {
+			D3D12Resource->Release();
+		}
 		ID3D12Resource* GetResource() { return D3D12Resource.Get(); }
 	protected:
 		ComPtr<ID3D12Resource> D3D12Resource;

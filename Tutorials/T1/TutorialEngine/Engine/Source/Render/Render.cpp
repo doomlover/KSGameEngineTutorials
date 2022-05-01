@@ -28,12 +28,14 @@ namespace ks
 			ConstBufferParameter.RoughnessMetallicFactor.y = MaterialData.MetallicFactor;
 		}
 
+#if !RHICONSTBUFFER_V1
 		PrimitiveConstBuffer = std::shared_ptr<TConstBuffer<FPrimitiveConstBufferParameter>>(
 			TConstBuffer<FPrimitiveConstBufferParameter>::CreateConstBuffer(ConstBufferParameter));
 		PrimitiveConstBuffer->GetRHIConstBuffer()->SetLocationIndex(0);
-
+#else
 		PrimitiveConstBuffer1.reset(GRHI->CreateConstBuffer1(&ConstBufferParameter, sizeof(FPrimitiveConstBufferParameter)));
 		PrimitiveConstBuffer1->SetLocationIndex(0);
+#endif
 	}
 
 	/**********************************************************************/
@@ -58,12 +60,14 @@ namespace ks
 		glm::mat4 Eye2World{Camera->GetWorldTrans()};
 		ViewConstBufferParm.EyePos = Eye2World[3];
 
-		/*BasePassConstBuffer = std::shared_ptr<TConstBuffer<FViewConstBufferParameter>>(
+#if !RHICONSTBUFFER_V1
+		BasePassConstBuffer = std::shared_ptr<TConstBuffer<FViewConstBufferParameter>>(
 			TConstBuffer<FViewConstBufferParameter>::CreateConstBuffer(ViewConstBufferParm));
-		BasePassConstBuffer->GetRHIConstBuffer()->SetLocationIndex(1);*/
-
+		BasePassConstBuffer->GetRHIConstBuffer()->SetLocationIndex(1);
+#else
 		BasePassConstBuffer1.reset(GRHI->CreateConstBuffer1(&ViewConstBufferParm, sizeof(FViewConstBufferParameter)));
 		BasePassConstBuffer1->SetLocationIndex(1);
+#endif
 	}
 
 	void FRenderScene::AddPrimitive(FStaticMeshComponent* MeshComponent)

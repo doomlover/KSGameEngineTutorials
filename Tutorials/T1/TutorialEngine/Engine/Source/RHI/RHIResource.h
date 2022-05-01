@@ -1,5 +1,8 @@
 #pragma once
 
+#define RHICONSTBUFFER_V1 1
+#define RHIRESOURCE_V1 1
+
 namespace ks
 {
 	/*enum class ERHIResourceType

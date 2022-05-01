@@ -22,21 +22,30 @@ namespace ks
 		GRHI->SetPipelineState(RHIPipelineState.get());
 		
 		// bind pass shader parameter
-		//GRHI->SetShaderConstBuffer(Renderer->RenderScene->BasePassConstBuffer->GetRHIConstBuffer());
+#if !RHICONSTBUFFER_V1
+		GRHI->SetShaderConstBuffer(Renderer->RenderScene->BasePassConstBuffer->GetRHIConstBuffer());
+#else
 		GRHI->SetConstBuffer(Renderer->RenderScene->BasePassConstBuffer1.get());
+#endif
 		
 		// bind primitive shader parameter
 		for (int32 i{0}; i < Renderer->RenderScene->Primitives.size(); ++i)
 		{
 			FRenderPrimitive* Prim = Renderer->RenderScene->Primitives.at(i).get();
-			//GRHI->SetShaderConstBuffer(Prim->GetPrimitiveConstBuffer()->GetRHIConstBuffer());
+#if !RHICONSTBUFFER_V1
+			GRHI->SetShaderConstBuffer(Prim->GetPrimitiveConstBuffer()->GetRHIConstBuffer());
+#else
 			GRHI->SetConstBuffer(Prim->GetConstBuffer());
-
+#endif
 			// set vertex input
 			const FMeshRenderData* MeshRenderData{ Prim->GetRenderData() };
+#if !RHIRESOURCE_V1
 			const IRHIVertexBuffer* VertexBuffers[] = {MeshRenderData->GetRHIVertexBuffer(), MeshRenderData->GetRHIAttrBuffer()};
 			GRHI->SetVertexBuffers(VertexBuffers, _countof(VertexBuffers));
-
+#else
+			const IRHIVertexBuffer1* VertexBuffers1[] = {MeshRenderData->GetRHIVertexBuffer1(), MeshRenderData->GetRHIAttrBuffer1()};
+			GRHI->SetVertexBuffers1(VertexBuffers1, _countof(VertexBuffers1));
+#endif
 			// set index buffer and draw primitives
 			const IRHIIndexBuffer* IndexBuffer{ MeshRenderData->GetRHIIndexBuffer() };
 			GRHI->DrawIndexedPrimitive(IndexBuffer);
