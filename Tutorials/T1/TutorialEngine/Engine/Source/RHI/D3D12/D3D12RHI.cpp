@@ -1,7 +1,8 @@
 #include "engine_pch.h"
 
 #include "RHI/D3D12/D3D12RHI.h"
-#include "RHI/D3D12/D3D12PipelineState.h"
+#include "D3D12Resource.h"
+#include "D3D12PipelineState.h"
 
 // Link d3d12 libs
 #pragma comment(lib,"d3dcompiler.lib")

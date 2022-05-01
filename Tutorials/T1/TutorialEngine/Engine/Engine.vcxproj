@@ -231,6 +231,7 @@
     <ClInclude Include="Source\Render\Render.h" />
     <ClInclude Include="Source\RHI\d3d12x.h" />
     <ClInclude Include="Source\RHI\D3D12\D3D12Common.h" />
+    <ClInclude Include="Source\RHI\D3D12\D3D12Resource.h" />
     <ClInclude Include="Source\RHI\D3D12\D3D12RHI.h" />
     <ClInclude Include="Source\RHI\RHI.h" />
     <ClInclude Include="Source\RHI\RHICommon.h" />

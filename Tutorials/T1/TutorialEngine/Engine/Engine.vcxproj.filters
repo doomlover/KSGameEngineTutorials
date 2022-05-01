@@ -212,5 +212,8 @@
     <ClInclude Include="Source\RHI\RHICommon.h">
       <Filter>Source\Public\RHI</Filter>
     </ClInclude>
+    <ClInclude Include="Source\RHI\D3D12\D3D12Resource.h">
+      <Filter>Source\Public\RHI\D3D12</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
