@@ -233,7 +233,9 @@
     <ClInclude Include="Source\RHI\D3D12\D3D12Common.h" />
     <ClInclude Include="Source\RHI\D3D12\D3D12RHI.h" />
     <ClInclude Include="Source\RHI\RHI.h" />
+    <ClInclude Include="Source\RHI\RHICommon.h" />
     <ClInclude Include="Source\RHI\RHIPipelineStateDesc.h" />
+    <ClInclude Include="Source\RHI\RHIResource.h" />
     <ClInclude Include="Source\ThirdParty\glm\ext.hpp" />
     <ClInclude Include="Source\ThirdParty\glm\glm.hpp" />
     <ClInclude Include="Source\ThirdParty\nlohmann\json.hpp" />

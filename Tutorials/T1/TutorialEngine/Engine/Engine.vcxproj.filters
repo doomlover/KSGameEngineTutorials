@@ -206,5 +206,11 @@
     <ClInclude Include="Source\Core\Asset\AssetManager.h" />
     <ClInclude Include="Source\Core\Bounds.h" />
     <ClInclude Include="Source\Core\Component\MeshComponent.h" />
+    <ClInclude Include="Source\RHI\RHIResource.h">
+      <Filter>Source\Public\RHI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\RHI\RHICommon.h">
+      <Filter>Source\Public\RHI</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,5 +1,5 @@
 #pragma once
-#include "Core/CoreMinimal.h"
+#include "RHICommon.h"
 #include "RHI/RHIPipelineStateDesc.h"
 
 namespace ks
@@ -36,16 +36,6 @@ namespace ks
 
 	extern IRHI* GRHI;
 
-
-	class IRHIResource
-	{
-	public:
-		virtual ~IRHIResource(){}
-		virtual void* Map() = 0;
-		virtual void Unmap() = 0;
-		uint32 Size{0};
-	};
-
 	template<typename _TParmType>
 	class TConstBuffer
 	{
@@ -66,60 +56,6 @@ namespace ks
 		}
 	private:
 		std::unique_ptr<IRHIConstBuffer> RHIConstBuffer;
-	};
-
-	class IRHIConstBuffer
-	{
-	public:
-		IRHIConstBuffer() = default;
-		virtual ~IRHIConstBuffer(){}
-		virtual void UpdateData(const void* pData, uint32 Size) {
-			void* pDest = RHIResource->Map();
-			memcpy(pDest, pData, Size);
-			RHIResource->Unmap();
-		}
-		void SetLocationIndex(int32 Index) { LocationIndex = Index; }
-		int32 GetLocationIndex() const { return LocationIndex; }
-	protected:
-		int32 LocationIndex{-1};
-		std::unique_ptr<IRHIResource> RHIResource;
-	};
-
-	class IRHIBuffer
-	{
-	public:
-		IRHIBuffer() = delete;
-		IRHIBuffer(uint32 _Size)
-			:Size(_Size)
-		{}
-		virtual ~IRHIBuffer(){}
-	protected:
-		uint32 Size{0};
-		std::unique_ptr<IRHIResource> RHIResource;
-	};
-
-	class IRHIIndexBuffer
-	{
-	public:
-		IRHIIndexBuffer(EELEM_FORMAT InElemFormat, uint32 _Count, uint32 InSize):ElemFormat(InElemFormat),Count(_Count),Size(InSize){}
-		virtual ~IRHIIndexBuffer(){}
-		uint32 GetIndexCount() const { return Count; }
-	protected:
-		EELEM_FORMAT ElemFormat{ EELEM_FORMAT::UNKNOWN };
-		uint32 Count{0};
-		uint32 Size{0};
-		std::shared_ptr<IRHIBuffer> RHIBuffer;
-	};
-
-	class IRHIVertexBuffer
-	{
-	public:
-		IRHIVertexBuffer(uint32 InStride, uint32 InSize) :Stride(InStride), Size(InSize) {}
-		virtual ~IRHIVertexBuffer(){}
-	protected:
-		uint32 Stride{0};
-		uint32 Size{0};
-		std::shared_ptr<IRHIBuffer> RHIBuffer;
 	};
 
 	class IRHIPipelineState
