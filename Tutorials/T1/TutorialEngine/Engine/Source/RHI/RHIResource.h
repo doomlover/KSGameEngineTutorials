@@ -121,6 +121,23 @@ namespace ks
 		std::shared_ptr<IRHIBuffer> RHIBuffer;
 	};
 
+	struct FTexture2DDesc
+	{
+		int32_t Width;
+		int32_t Height;
+		EELEM_FORMAT Format{EELEM_FORMAT::UNKNOWN};
+	};
+
+	class IRHITexture2D
+	{
+	public:
+		IRHITexture2D(const FTexture2DDesc& _Desc) :Desc(_Desc) {}
+		virtual ~IRHITexture2D() = 0 {}
+		const FTexture2DDesc& GetDesc() { return Desc; }
+	protected:
+		FTexture2DDesc Desc;
+	};
+
 	/**************************************************************************************/
 	/**************************************************************************************/
 	/**************************************************************************************/

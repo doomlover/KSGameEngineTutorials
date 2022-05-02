@@ -66,7 +66,7 @@ namespace ks::d3d12
 		virtual ~FD3D12ConstBuffer() {}
 		const FDescriptorHandle& GetViewHandle() const { return ViewHandle; }
 	private:
-		d3d12::FDescriptorHandle ViewHandle;
+		FDescriptorHandle ViewHandle;
 	};
 
 	class FD3D12IndexBuffer : public IRHIIndexBuffer
@@ -141,5 +141,18 @@ namespace ks::d3d12
 		const D3D12_VERTEX_BUFFER_VIEW& GetVertexBufferView() const { return BufferView; }
 	private:
 		D3D12_VERTEX_BUFFER_VIEW BufferView;
+	};
+
+	class FD3D12Texture2D : public IRHITexture2D, public FD3D12Resource1
+	{
+		friend class FD3D12RHI;
+	public:
+		FD3D12Texture2D(const FTexture2DDesc& _Desc) :IRHITexture2D(_Desc) {}
+		virtual ~FD3D12Texture2D() = default;
+		int32_t GetLocationIndex() const { return LocaltionIndex; }
+		void SetLocationIndex(int32_t _LocationIndex) { LocaltionIndex = _LocationIndex; }
+	private:
+		int32_t LocaltionIndex{ -1 };
+		FDescriptorHandle ViewHandle;
 	};
 }

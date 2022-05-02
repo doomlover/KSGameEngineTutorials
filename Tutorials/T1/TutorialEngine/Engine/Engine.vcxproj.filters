@@ -112,11 +112,17 @@
     <ClCompile Include="Source\Core\Component\LightComponent.cpp">
       <Filter>Source\Private\Core\Component</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Core\Asset\MaterialAsset.cpp" />
-    <ClCompile Include="Source\Core\Asset\AssetManager.cpp" />
-    <ClCompile Include="Source\Core\Component\MeshComponent.cpp" />
     <ClCompile Include="Source\RHI\D3D12\D3D12Resource.cpp">
       <Filter>Source\Public\RHI\D3D12</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\Asset\AssetManager.cpp">
+      <Filter>Source\Private\Core\Asset</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\Asset\MaterialAsset.cpp">
+      <Filter>Source\Private\Core\Asset</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\Component\MeshComponent.cpp">
+      <Filter>Source\Private\Core\Component</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -204,11 +210,6 @@
     <ClInclude Include="Source\Core\Component\Component.h">
       <Filter>Source\Public\Core\Component</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Core\Asset\MaterialAsset.h" />
-    <ClInclude Include="Source\Core\Asset\MaterialData.h" />
-    <ClInclude Include="Source\Core\Asset\AssetManager.h" />
-    <ClInclude Include="Source\Core\Bounds.h" />
-    <ClInclude Include="Source\Core\Component\MeshComponent.h" />
     <ClInclude Include="Source\RHI\RHIResource.h">
       <Filter>Source\Public\RHI</Filter>
     </ClInclude>
@@ -217,6 +218,21 @@
     </ClInclude>
     <ClInclude Include="Source\RHI\D3D12\D3D12Resource.h">
       <Filter>Source\Public\RHI\D3D12</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\Asset\AssetManager.h">
+      <Filter>Source\Public\Core\Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\Bounds.h">
+      <Filter>Source\Public\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\Asset\MaterialAsset.h">
+      <Filter>Source\Public\Core\Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\Asset\MaterialData.h">
+      <Filter>Source\Public\Core\Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\Component\MeshComponent.h">
+      <Filter>Source\Public\Core\Component</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

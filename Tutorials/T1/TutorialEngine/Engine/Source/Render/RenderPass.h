@@ -40,6 +40,8 @@ namespace ks
 		std::unique_ptr<IRHIPipelineState> RHIPipelineState;
 		static std::unordered_map<std::string, std::unique_ptr<FRenderPass>> RenderPasses;
 	};
+
+
 }
 
 

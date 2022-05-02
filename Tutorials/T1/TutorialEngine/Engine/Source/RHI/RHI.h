@@ -35,6 +35,7 @@ namespace ks
 		virtual IRHIIndexBuffer1* CreateIndexBuffer1(EELEM_FORMAT ElemFormat, uint32 Count, uint32 Size, const void* Data) = 0;
 		virtual void DrawIndexedPrimitive(const IRHIIndexBuffer* IndexBuffer) = 0;
 		virtual void DrawIndexedPrimitive1(const IRHIIndexBuffer1* IndexBuffer) = 0;
+		virtual IRHITexture2D* CreateTexture2D(const FTexture2DDesc& Desc) = 0;
 	};
 
 	extern IRHI* GRHI;

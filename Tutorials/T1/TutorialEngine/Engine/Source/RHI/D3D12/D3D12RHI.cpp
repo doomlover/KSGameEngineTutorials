@@ -813,6 +813,14 @@ namespace ks::d3d12
 		D3D12GfxCommandList->DrawIndexedInstanced(IndexCount, 1, 0, 0, 0);
 	}
 
+	ks::IRHITexture2D* FD3D12RHI::CreateTexture2D(const FTexture2DDesc& Desc)
+	{
+		FD3D12Texture2D* Texture = new FD3D12Texture2D(Desc);
+
+
+		return Texture;
+	}
+
 }
 
 
