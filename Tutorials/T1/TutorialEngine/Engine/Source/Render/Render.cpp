@@ -45,20 +45,53 @@ namespace ks
 	{
 		// base pass const buffer
 		FViewConstBufferParameter ViewConstBufferParm;
-		// view projection matrix
-		glm::mat4 view_mat{ Scene->GetViewTrans() };
-		glm::mat4 proj_mat{ Scene->GetProjectionTrans() };
-		ViewConstBufferParm.ViewProjTrans = proj_mat * view_mat;
-		ViewConstBufferParm.ViewProjTrans = glm::transpose(ViewConstBufferParm.ViewProjTrans);
+
+		// camera-view projection matrix
+		// todo : move to ticking
+		{
+			glm::mat4 CameraView{ Scene->GetViewTrans() };
+			glm::mat4 PersProj{ Scene->GetProjectionTrans() };
+			ViewConstBufferParm.ViewProjTrans = glm::transpose(PersProj * CameraView);
+		}
 		// directional light direction and intensity
-		glm::vec3 LightDir;
-		float LightIns;
-		Scene->GetDirectionalLight(LightDir, LightIns);
-		ViewConstBufferParm.D_LightDirectionAndInstensity = glm::vec4(LightDir, LightIns);
+		// todo : move to ticking
+		{
+			glm::vec3 LightDir;
+			float LightIns;
+			auto LightNode = Scene->GetLightNode();
+			assert(LightNode && LightNode->LightComponent);
+			glm::mat4 LightToWorld = LightNode->GetWorldTrans();
+			glm::mat4 WorldToLight = glm::affineInverse(LightToWorld);
+			LightDir = glm::normalize(glm::vec3(LightToWorld[2]));
+			LightIns = LightNode->LightComponent->GetIntensity();
+			ViewConstBufferParm.D_LightDirectionAndInstensity = glm::vec4(LightDir, LightIns);
+
+			const auto& SceneBounds{ Scene->GetSceneBounds() };
+			const float& SceneBoundsRadius{ SceneBounds.Sphere.Radius };
+			glm::vec4 Center = WorldToLight * glm::vec4(SceneBounds.Sphere.Center, 1.f);
+			glm::mat4 OrthoProj = glm::ortho(
+				Center.x-SceneBoundsRadius, Center.x+SceneBoundsRadius,
+				Center.y-SceneBoundsRadius, Center.y+SceneBoundsRadius,
+				Center.z-SceneBoundsRadius, Center.z+SceneBoundsRadius);
+			ViewConstBufferParm.LightProj = glm::transpose(OrthoProj * WorldToLight);
+
+			glm::mat4 NDC2Tex(
+				0.5f, 0.0f, 0.0f, 0.0f,
+				0.0f, -0.5f, 0.0f, 0.0f,
+				0.0f, 0.0f, 1.0f, 0.0f,
+				0.5f, 0.5f, 0.0f, 1.0f
+			);
+			ViewConstBufferParm.LightProjTex = glm::transpose(NDC2Tex * OrthoProj * WorldToLight);
+		}
+
 		// get look direction
-		FSceneNode* Camera{Scene->GetCamera()};
-		glm::mat4 Eye2World{Camera->GetWorldTrans()};
-		ViewConstBufferParm.EyePos = Eye2World[3];
+		// todo : move to ticking
+		{
+			FSceneNode* Camera{ Scene->GetCamera() };
+			glm::mat4 Eye2World{ Camera->GetWorldTrans() };
+			ViewConstBufferParm.EyePos = Eye2World[3];
+		}
+
 
 #if !RHICONSTBUFFER_V1
 		BasePassConstBuffer = std::shared_ptr<TConstBuffer<FViewConstBufferParameter>>(
@@ -103,6 +136,8 @@ namespace ks
 	{
 		GRHI->BeginFrame();
 
+		RenderShadowPass();
+
 		RenderBasePass();
 
 		GRHI->EndFrame();
@@ -114,7 +149,7 @@ namespace ks
 		if(RenderScene)
 		{
 			KS_INFO(TEXT("\tFree RenderScene"));
-			FRenderer::RenderScenes.erase(RenderScene);
+			size_t NumErase = FRenderer::RenderScenes.erase(RenderScene);
 			RenderScene = nullptr;
 		}
 		FRenderPass::ReleaseAllPasses();
@@ -123,22 +158,64 @@ namespace ks
 	void FRenderer::Init()
 	{
 		// create base pass
-		FRenderPassDesc Desc{};
-		Desc.Name = "BasePass";
-		Desc.Renderer = this;
-		Desc.PipelineStateDesc.InputLayout = {
-			{"POSITION", 0, EELEM_FORMAT::R32G32B32_FLOAT, 0, 0},
-			{"NORMAL", 0, EELEM_FORMAT::R32G32B32_FLOAT, 1, 0}
-		};
-		Desc.PipelineStateDesc.VertexShaderDesc = {"BasePassVS", util::GetShaderPath("BasePass.hlsl"), "VS"};
-		Desc.PipelineStateDesc.PixelShaderDesc = {"BasePassPS", util::GetShaderPath("BasePass.hlsl"), "PS"};
-		FRenderPass* Pass = FRenderPass::CreatePass(Desc);
-		assert(Pass);
+		{
+			FRenderPassDesc Desc{};
+			Desc.Name = "BasePass";
+			Desc.ViewPort = GRHIConfig.ViewPort;
+			Desc.Renderer = this;
+			Desc.PipelineStateDesc.InputLayout = {
+				/*SemanticName, SemanticIndex, Format, InputSlot, Stride*/
+				{"POSITION", 0, EELEM_FORMAT::R32G32B32_FLOAT, 0, 0},
+				{"NORMAL", 0, EELEM_FORMAT::R32G32B32_FLOAT, 1, 0}
+			};
+			Desc.PipelineStateDesc.VertexShaderDesc = { "BasePassVS", util::GetShaderPath("BasePass.hlsl"), "VS" };
+			Desc.PipelineStateDesc.PixelShaderDesc = { "BasePassPS", util::GetShaderPath("BasePass.hlsl"), "PS" };
+			Desc.PipelineStateDesc.NumRenderTargets = 1;
+			Desc.PipelineStateDesc.RenderTargetFormats[0] = GRHIConfig.BackBufferFormat;
+			Desc.PipelineStateDesc.DepthBufferFormat = GRHIConfig.DepthBufferFormat;
+			FRenderPass* Pass = FRenderPass::CreatePass<FBasePass>(Desc);
+			assert(Pass);
+		}
+
+		// setup shadow pass
+		{
+			FRenderPassDesc Desc{};
+			Desc.Name = "ShadowPass";
+			Desc.ViewPort = { 0, 0, GRHIConfig.ShadowMapSize, GRHIConfig.ShadowMapSize };
+			Desc.Renderer = this;
+			Desc.PipelineStateDesc.InputLayout = {
+				/*SemanticName, SemanticIndex, Format, InputSlot, Stride*/
+				{"POSITION", 0, EELEM_FORMAT::R32G32B32_FLOAT, 0, 0},
+				{"NORMAL", 0, EELEM_FORMAT::R32G32B32_FLOAT, 1, 0}
+			};
+			Desc.PipelineStateDesc.VertexShaderDesc = { "ShadowPassVS", util::GetShaderPath("ShadowPass.hlsl"), "VS" };
+			Desc.PipelineStateDesc.PixelShaderDesc = { "ShadowPassPS", util::GetShaderPath("ShadowPass.hlsl"), "PS" };
+			Desc.PipelineStateDesc.NumRenderTargets = 0;
+			Desc.PipelineStateDesc.RenderTargetFormats[0] = EELEM_FORMAT::UNKNOWN;
+			Desc.PipelineStateDesc.DepthBufferFormat = GRHIConfig.DepthBufferFormat;
+
+			Desc.PipelineStateDesc.RasterizerState.DepthBias = 100000;
+			Desc.PipelineStateDesc.RasterizerState.SlopeScaledDepthBias = 1.0f;
+
+			FRenderPass* Pass = FRenderPass::CreatePass<FShadowPass>(Desc);
+			assert(Pass);
+		}
 	}
 
 	void FRenderer::RenderBasePass()
 	{
 		FRenderPass* Pass = FRenderPass::GetPass("BasePass");
+		Pass->Begin();
 		Pass->Render();
+		Pass->End();
 	}
+
+	void FRenderer::RenderShadowPass()
+	{
+		static FRenderPass* Pass = FRenderPass::GetPass("ShadowPass");
+		Pass->Begin();
+		Pass->Render();
+		Pass->End();
+	}
+
 }

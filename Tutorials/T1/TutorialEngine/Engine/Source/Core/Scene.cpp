@@ -54,6 +54,22 @@ namespace ks
 				pParent->AddChild(pChild);
 			}
 		}
+		// update scene bounds
+		{
+			auto& Box{ SceneBounds.Box };
+			Box.Min = glm::vec3(std::numeric_limits<float>::max());
+			Box.Max = glm::vec3(std::numeric_limits<float>::min());
+			for (auto& SceneNode : SceneNodes)
+			{
+				if (SceneNode->StaticMeshComponent)
+				{
+					auto& Bounds{SceneNode->StaticMeshComponent->GetBounds()};
+					Box += Bounds.Box;
+				}
+			}
+			// update sphere bounds
+			SceneBounds = FBounds(Box.Min, Box.Max);
+		}
 		
 		// rendering, create render scene
 		RenderScene = FRenderer::CreateRenderScene(this);

@@ -5,7 +5,7 @@
 #include <D3Dcompiler.h>
 #include <d3d12.h>
 #include "RHI/D3D12/d3d12x.h" // helper structures and functions
-#include "Core/Math.h"
+#include "Core/CoreMinimal.h"
 
 using Microsoft::WRL::ComPtr;
 
@@ -14,8 +14,15 @@ using Microsoft::WRL::ComPtr;
 	if(FAILED(x)) {\
 		__debugbreak();\
 	}
+
+#define KS_NAME_D3D12_OBJECT(obj, name) \
+		obj->SetName(name); \
+		OutputDebugString(TEXT("D3D12 Object Created:")); \
+		OutputDebugString(name); \
+		OutputDebugString(L"\n")
 #else
 #define KS_D3D12_CALL(x) x
+#define KS_NAME_D3D12_OBJECT(obj, name)
 #endif // KS_DEBUG_BUILD
 namespace ks::d3d12
 {

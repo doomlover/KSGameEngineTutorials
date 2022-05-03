@@ -33,4 +33,11 @@ namespace ks::d3d12
 
 	}
 
+	FD3D12DepthStencilBuffer1::FD3D12DepthStencilBuffer1(const FTexture2DDesc& _Desc)
+		:IRHIDepthStencilBuffer(_Desc)
+		,FD3D12Texture2D1(_Desc)
+	{
+
+	}
+
 }

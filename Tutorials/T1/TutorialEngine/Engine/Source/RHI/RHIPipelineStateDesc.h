@@ -32,12 +32,20 @@ namespace ks
 	using FVertexShaderDesc = FShaderDesc<EShaderType::VertexShader>;
 	using FPixelShaderDesc = FShaderDesc<EShaderType::PixelShader>;
 
-	class FRHIPipelineStateDesc
+	struct FRHIPipelineStateDesc
 	{
-	public:
-		FRHIPipelineStateDesc() = default;
+		struct FRasterizerState
+		{
+			int32_t DepthBias{0};
+			float DepthBiasClamp{0.f};
+			float SlopeScaledDepthBias{0.f};
+		};
 		std::vector<FInputElemDesc> InputLayout;
 		FVertexShaderDesc VertexShaderDesc;
 		FPixelShaderDesc PixelShaderDesc;
+		uint32_t NumRenderTargets{1};
+		EELEM_FORMAT RenderTargetFormats[8];
+		EELEM_FORMAT DepthBufferFormat;
+		FRasterizerState RasterizerState;
 	};
 }

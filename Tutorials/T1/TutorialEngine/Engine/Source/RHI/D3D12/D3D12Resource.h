@@ -99,9 +99,10 @@ namespace ks::d3d12
 	public:
 		FD3D12Resource1() = default;
 		virtual ~FD3D12Resource1() = 0 {
-			D3D12Resource->Release();
+			uint32_t ref = D3D12Resource.Reset();
 		}
 		ID3D12Resource* GetResource() { return D3D12Resource.Get(); }
+		ComPtr<ID3D12Resource>& GetComPtr() { return D3D12Resource; }
 	protected:
 		ComPtr<ID3D12Resource> D3D12Resource;
 	};
@@ -154,5 +155,63 @@ namespace ks::d3d12
 	private:
 		int32_t LocaltionIndex{ -1 };
 		FDescriptorHandle ViewHandle;
+	};
+
+	class FD3D12DepthStencilBuffer : public IRHIDepthStencilBuffer
+	{
+		friend class FD3D12RHI;
+	public:
+		using IRHIDepthStencilBuffer::IRHIDepthStencilBuffer;
+		const FDescriptorHandle& GetDepthStencilView() { return DSVHandle; }
+	private:
+		FDescriptorHandle DSVHandle;
+	};
+
+	class FD3D12RenderResource : public FD3D12Resource1
+	{
+	public:
+		virtual ~FD3D12RenderResource() = 0 {}
+		const FDescriptorHandle& GetViewHandle() const { return ViewHandle; }
+		void SetViewHandle(const FDescriptorHandle& _ViewHandle) { ViewHandle = _ViewHandle; }
+	protected:
+		FDescriptorHandle ViewHandle;
+	};
+
+	class FD3D12Texture2D1 : public IRHITexture2D, public FD3D12RenderResource
+	{
+	public:
+		using IRHITexture2D::IRHITexture2D;
+	};
+
+	class FD3D12RenderTarget : public IRHIRenderTarget, public FD3D12RenderResource
+	{
+		friend class FD3D12RHI;
+	public:
+		using IRHIRenderTarget::IRHIRenderTarget;
+		void SetRenderTargetView(const FDescriptorHandle& _RTVHandle) { RTVHandle = _RTVHandle; }
+		const FDescriptorHandle& GetRenderTargetView() { return RTVHandle; }
+	private:
+		FDescriptorHandle RTVHandle;
+	};
+
+	class FD3D12DepthStencilBuffer1 : public IRHIDepthStencilBuffer, public FD3D12Texture2D1
+	{
+		friend class FD3D12RHI;
+	public:
+		FD3D12DepthStencilBuffer1(const FTexture2DDesc& _Desc);
+		const FDescriptorHandle& GetDepthStencilView() { return DSVHandle; }
+		virtual IRHITexture2D* GetTexture2D() override
+		{
+			return dynamic_cast<IRHITexture2D*>(this);
+		}
+	private:
+		FDescriptorHandle DSVHandle;
+	};
+
+	class FD3D12ConstBuffer2 : public FD3D12RenderResource
+	{
+		friend class FD3D12RHI;
+	public:
+		// create with cbv
 	};
 }

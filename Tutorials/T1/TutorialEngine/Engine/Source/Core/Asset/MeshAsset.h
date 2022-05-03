@@ -67,6 +67,8 @@ namespace ks {
 			PositionData = Other.PositionData;
 			AttributeData = Other.AttributeData;
 			MaterialData = Other.MaterialData;
+			Min = Other.Min;
+			Max = Other.Max;
 			return *this;
 		}
 		FMeshData(FMeshData&& TempMeshData) noexcept {
@@ -80,6 +82,8 @@ namespace ks {
 			PositionData = std::move(Tmp.PositionData);
 			AttributeData = std::move(Tmp.AttributeData);
 			MaterialData = std::move(Tmp.MaterialData);
+			Min = std::move(Tmp.Min);
+			Max = std::move(Tmp.Max);
 			return *this;
 		}
 	};

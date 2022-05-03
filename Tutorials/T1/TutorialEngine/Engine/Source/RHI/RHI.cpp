@@ -5,6 +5,7 @@
 namespace ks
 {
 	IRHI* GRHI = nullptr;
+	FRHIConfig GRHIConfig;
 
 	/*IRHI::~IRHI()
 	{

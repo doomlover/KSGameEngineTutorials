@@ -17,6 +17,8 @@
 #include <set>
 #include <queue>
 #include <deque>
+#include <limits>
+#include <format>
 
 #include "Core/Platform.h"
 #include "Core/Math.h"
@@ -40,6 +42,7 @@ namespace ks
 	/* enum version of gltf accessor.type */
 	enum class EELEM_TYPE : unsigned short
 	{
+		INVALID,
 		SCALAR,
 		VEC2,
 		VEC3,
@@ -47,19 +50,22 @@ namespace ks
 		MAT2,
 		MAT3,
 		MAT4,
-		INVALID,
 	};
 
 	enum class EELEM_FORMAT : unsigned int
 	{
+		UNKNOWN,
 		R8_INT,
 		R8_UINT,
 		R16_INT,
 		R16_UINT,
+		D24_UNORM_S8_UINT,
+		R8G8B8A8_UNORM,
 		R32G32B32_FLOAT,
 		R32G32B32A32_FLOAT,
-		UNKNOWN,
 	};
+
+	using FColor = float[4];
 
 namespace util
 {
@@ -116,4 +122,9 @@ namespace util
 			return Path.substr(0, RootPos);
 		}
 	};
+}
+
+namespace ks::color
+{
+	const FColor LightSteelBlue={ 0.690196097f, 0.768627524f, 0.870588303f, 1.000000000f };
 }

@@ -1,12 +1,14 @@
 #pragma once
 
 #include "RHI/RHI.h"
+#include "D3D12Resource.h"
 #include "RHI/D3D12/D3D12Common.h"
 
 namespace ks::d3d12
 {
 	class FD3D12Resource;
 	class FD3D12RHI;
+	struct FD3D12RHIContext;
 
 	extern FD3D12RHI* GD3D12RHI;
 
@@ -14,6 +16,7 @@ namespace ks::d3d12
 	{
 	public:
 		explicit FDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE _Type) : Type{ _Type } {}
+		virtual ~FDescriptorHeap() {}
 		void Init(uint32 _Capacity, bool bShaderVisiable);
 		FDescriptorHandle Allocate();
 		ID3D12DescriptorHeap* GetHeap() { return Heap.Get(); }
@@ -39,7 +42,7 @@ namespace ks::d3d12
 	public:
 		// RHI interface
 		virtual ~FD3D12RHI();
-		virtual void Init() override;
+		virtual void Init(const FRHIConfig& Config) override;
 		virtual void Shutdown() override;
 		virtual void ResizeWindow() override;
 		virtual void FlushRenderingCommands() override;
@@ -47,7 +50,6 @@ namespace ks::d3d12
 		virtual void EndFrame() override;
 		virtual IRHIConstBuffer* CreateConstBuffer(const void* Data, uint32 Size) override;
 		virtual IRHIConstBuffer1* CreateConstBuffer1(const void* Data, uint32 Size) override;
-		virtual IRHIBuffer* CreateBuffer(uint32 Size, const void* Data) override;
 		virtual void SetPipelineState(IRHIPipelineState* PipelineState) override;
 		virtual IRHIPipelineState* CreatePipelineState(const FRHIPipelineStateDesc& Desc) override;
 		virtual void SetShaderConstBuffer(IRHIConstBuffer* ConstBuffer) override;
@@ -63,53 +65,51 @@ namespace ks::d3d12
 		virtual void DrawIndexedPrimitive(const IRHIIndexBuffer* IndexBuffer) override;
 		virtual void DrawIndexedPrimitive1(const IRHIIndexBuffer1* IndexBuffer) override;
 		virtual IRHITexture2D* CreateTexture2D(const FTexture2DDesc& Desc) override;
+		virtual IRHIDepthStencilBuffer* CreateDepthStencilBuffer(const FTexture2DDesc& Desc) override;
+		virtual void SetViewports(uint32_t Num, const FViewPort* Viewports) override;
+		virtual void ClearRenderTarget(const FColor& Color) override;
+		virtual void SetRenderTarget(IRHIRenderTarget* RenderTarget, IRHIDepthStencilBuffer* DepthBuffer) override;
+		virtual void ClearDepthStencilBuffer() override;
+		virtual void BeginPass() override;
+		virtual void EndPass() override;
+		virtual IRHIRenderTarget* GetCurrentBackBuffer() override;
+		virtual IRHIDepthStencilBuffer* GetDefaultDepthStencilBuffer() override;
+		virtual void SetTexture2D(IRHITexture2D* Texture2D) override;
 		// static helper functions
 		static d3d12::FD3D12Resource* CreateConstBufferResource(size_t Size);
 		// d3d12 interface
 		FD3D12RHI() = default;
-		d3d12::FDescriptorHeap& GetCBVHeap() { return CBVHeap; }
+		FDescriptorHeap& GetCBVHeap();
 		DXGI_FORMAT GetBackbufferFormat() const { return BackBufferFormat; }
 		DXGI_FORMAT GetDepthbufferFormat() const { return DepthBufferFormat; }
-		ID3D12RootSignature* GetGlobalRootSignature() { return GlobalRootSignature.Get(); }
+		ID3D12RootSignature* GetGlobalRootSignature();
+		static const int SwapChainBufferCount = 2;
 	private:
-		ID3D12Resource* _CreateBuffer(uint32_t Size, D3D12_HEAP_TYPE HeapType, D3D12_RESOURCE_STATES ResStats);
+		IRHIBuffer* CreateBuffer(uint32 Size, const void* Data);
+		void CreateBuffer1(uint32_t Size, D3D12_HEAP_TYPE HeapType, D3D12_RESOURCE_STATES ResStats, ComPtr<ID3D12Resource>& OutResource);
 		int32_t UploadResourceData(ID3D12Resource* DestResource, const void* Data, uint32_t Size);
+		D3D12_CPU_DESCRIPTOR_HANDLE GetDefaultBackBufferView();
+		ID3D12Resource* GetDefaultBackBufferResource();
+		D3D12_CPU_DESCRIPTOR_HANDLE GetDefaultDepthBufferView();
 	private:
+		FD3D12RHIContext* Context{ nullptr };
 		HWND hWnd;
+		/***************************************************************/
 		ComPtr<IDXGIFactory7> DXGIFactory;
-		ComPtr<IDXGISwapChain> DXGISwapChain;
 		ComPtr<ID3D12Device> D3D12Device;
 
-		ComPtr<ID3D12Fence> D3D12Fence;
 		UINT64 CurrentFence = 0;
-
-		ComPtr<ID3D12CommandQueue> D3D12CommandQueue;
-		ComPtr<ID3D12CommandAllocator> D3D12CommandAllocator;
-		ComPtr<ID3D12GraphicsCommandList> D3D12GfxCommandList;
-
-		static const int SwapChainBufferCount = 2;
 		int CurrentBackBuffer = 0;
-		ComPtr<ID3D12Resource> D3D12SwapChainBuffers[SwapChainBufferCount];
-		ComPtr<ID3D12Resource> D3D12DepthStencilBuffer;
-
-		ComPtr<ID3D12DescriptorHeap> D3D12RTVHeap;
-		ComPtr<ID3D12DescriptorHeap> D3D12DSVHeap;
 
 		D3D12_VIEWPORT D3D12Viewport;
 		D3D12_RECT ScissorRect;
 
+		// going to be deprecated
 		UINT RTVSize = 0;
 		UINT DSVSize = 0;
 
 		D3D_DRIVER_TYPE D3DDriverType = D3D_DRIVER_TYPE_HARDWARE;
 		DXGI_FORMAT BackBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 		DXGI_FORMAT DepthBufferFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-
-		D3D12_CPU_DESCRIPTOR_HANDLE GetCurrentBackBufferView();
-		ID3D12Resource* GetCurrentBackBuffer();
-
-		/***************************************************************/
-		d3d12::FDescriptorHeap CBVHeap{D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV};
-		ComPtr<ID3D12RootSignature> GlobalRootSignature{ nullptr };
 	};
 } // ~ks::d3d12

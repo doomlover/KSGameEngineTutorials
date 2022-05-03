@@ -21,6 +21,11 @@ namespace ks
 	void FAssetManager::Shutdown()
 	{
 		KS_INFO(TEXT("\tFAssetManager::Shutdown"));
+		/*for (auto& asset : Assets)
+		{
+			KS_INFOA(std::format("{}", asset.second.use_count()).c_str());
+		}*/
+		Assets.clear();
 	}
 
 	std::shared_ptr<FSceneAsset> FAssetManager::CreateSceneAsset(const std::string& InGLTFPath)

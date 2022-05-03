@@ -1,63 +1,54 @@
 #pragma once
 
+#include "RHIPipelineStateDesc.h"
+
 #define RHICONSTBUFFER_V1 1
 #define RHIVERTBUFFER_V1 1
 #define RHIINDEXBUFFER_V1 1
 
 namespace ks
 {
-	/*enum class ERHIResourceType
+	class FRenderer;
+
+	struct FViewPort
 	{
-		BUFFER = 0,
-		TEX2D = 1,
-		TEX3D = 2,
-		UNKNOWN,
+		uint32_t TopLeftX{ 0 };
+		uint32_t TopLeftY{ 0 };
+		uint32_t Width{ 0 };
+		uint32_t Height{ 0 };
 	};
 
-	struct FRHIResourceDesc
+	struct FRHIConfig
 	{
-		ERHIResourceType ResourceType{ERHIResourceType::UNKNOWN};
-		uint64_t Alignment{0};
-		uint64_t Width;
-		uint32_t Height;
-		uint16_t DepthOrArraySize{1};
-		uint16_t MipLevels{0};
-		EELEM_FORMAT Format{EELEM_FORMAT::UNKNOWN};
+		FViewPort ViewPort;
+		EELEM_FORMAT BackBufferFormat;
+		EELEM_FORMAT DepthBufferFormat;
+		uint32_t ShadowMapSize{ 1024 };
+	};
 
-		static inline FRHIResourceDesc Buffer(
-			uint64_t _Width,
-			uint64_t _Alignment = 0)
-		{
-			return FRHIResourceDesc(
-				ERHIResourceType::BUFFER, _Alignment, _Width,
-				1, 1, 1, EELEM_FORMAT::UNKNOWN);
-		}
-		static inline FRHIResourceDesc Tex2D(
-			uint64_t _Width,
-			uint32_t _Height,
-			EELEM_FORMAT _Format,
-			uint16_t _ArraySize = 1,
-			uint16_t _MipLevels = 0,
-			uint64_t _Alignment = 0)
-		{
-			return FRHIResourceDesc(
-				ERHIResourceType::TEX2D, _Alignment, _Width, _Height,
-				_ArraySize, _MipLevels, _Format);
-		}
-	};*/
-
-	/*class IRHIResource
+	struct FRenderPassDesc
 	{
-	public:
-		IRHIResource(const FRHIResourceDesc& _Desc) :Desc(_Desc) {}
-		virtual ~IRHIResource() {}
-		virtual void* Map() = 0;
-		virtual void Unmap() = 0;
-		const FRHIResourceDesc& GetDesc() const { return Desc; }
-	protected:
-		FRHIResourceDesc Desc;
-	};*/
+		std::string Name{};
+		FViewPort ViewPort;
+		FRenderer* Renderer{ nullptr };
+		FRHIPipelineStateDesc PipelineStateDesc{};
+	};
 
+	struct FTexture2DDesc
+	{
+		int32_t Width;
+		int32_t Height;
+		EELEM_FORMAT Format{ EELEM_FORMAT::UNKNOWN };
+	};
+
+	struct FRenderTargetDesc
+	{
+
+	};
+}
+
+namespace ks
+{
 	class IRHIResource
 	{
 	public:
@@ -121,21 +112,17 @@ namespace ks
 		std::shared_ptr<IRHIBuffer> RHIBuffer;
 	};
 
-	struct FTexture2DDesc
-	{
-		int32_t Width;
-		int32_t Height;
-		EELEM_FORMAT Format{EELEM_FORMAT::UNKNOWN};
-	};
-
 	class IRHITexture2D
 	{
 	public:
 		IRHITexture2D(const FTexture2DDesc& _Desc) :Desc(_Desc) {}
 		virtual ~IRHITexture2D() = 0 {}
 		const FTexture2DDesc& GetDesc() { return Desc; }
+		void SetLocationIndex(int32_t _Index) { LocationIndex = _Index; }
+		int32_t GetLocationIndex() const { return LocationIndex; }
 	protected:
 		FTexture2DDesc Desc;
+		int32_t LocationIndex{-1};
 	};
 
 	/**************************************************************************************/
@@ -173,6 +160,24 @@ namespace ks
 	protected:
 		uint32 Stride{ 0 };
 		uint32 Size{ 0 };
-		std::shared_ptr<IRHIResource> RHIResource;
+	};
+
+	class IRHIDepthStencilBuffer
+	{
+	public:
+		IRHIDepthStencilBuffer(const FTexture2DDesc& _Desc) :Desc(Desc) {}
+		virtual ~IRHIDepthStencilBuffer() = 0 {}
+		virtual IRHITexture2D* GetTexture2D() = 0;
+	protected:
+		FTexture2DDesc Desc;
+	};
+
+	class IRHIRenderTarget
+	{
+	public:
+		IRHIRenderTarget(const FRenderTargetDesc& _Desc) :Desc(_Desc) {}
+		virtual ~IRHIRenderTarget() = 0 {}
+	protected:
+		FRenderTargetDesc Desc;
 	};
 }

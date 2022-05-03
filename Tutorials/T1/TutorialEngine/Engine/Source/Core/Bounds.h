@@ -31,6 +31,17 @@ namespace ks
 			inline glm::vec3 Extent() const {
 				return Max - Min;
 			}
+			friend FBox operator+(const FBox& B1, const FBox& B2) {
+				FBox Box;
+				Box.Min = glm::min(B1.Min, B2.Min);
+				Box.Max = glm::max(B1.Max, B2.Max);
+				return Box;
+			}
+			FBox& operator+=(const FBox& Box) {
+				Min = glm::min(Min, Box.Min);
+				Max = glm::max(Max, Box.Max);
+				return *this;
+			}
 		};
 
 		struct FSphere

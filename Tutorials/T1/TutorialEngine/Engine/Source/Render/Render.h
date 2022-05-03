@@ -14,6 +14,8 @@ namespace ks
 	struct FViewConstBufferParameter
 	{
 		glm::mat4 ViewProjTrans{1.f};
+		glm::mat4 LightProj{1.f};
+		glm::mat4 LightProjTex{1.f};
 		glm::vec4 D_LightDirectionAndInstensity{0.f};
 		glm::vec3 EyePos{0.f};
 	};
@@ -32,6 +34,7 @@ namespace ks
 		using ConstBufferType = TConstBuffer<FPrimitiveConstBufferParameter>;
 		using ConstBufferPtrType = ConstBufferType::PtrType;
 		FRenderPrimitive(FStaticMeshComponent* MeshComponent);
+		~FRenderPrimitive() {}
 		ConstBufferPtrType GetPrimitiveConstBuffer() { return PrimitiveConstBuffer.get(); }
 		IRHIConstBuffer1* GetConstBuffer() { return PrimitiveConstBuffer1.get(); }
 		const FMeshRenderData* GetRenderData() const { return RenderData; }
@@ -51,13 +54,16 @@ namespace ks
 		friend class FRenderer;
 		friend class FRenderPass;
 	public:
+		using PrimPtr = std::unique_ptr<FRenderPrimitive>;
 		FRenderScene(FScene* InScene);
 		~FRenderScene() {}
 		void AddPrimitive(FStaticMeshComponent* MeshComponent);
 		void Update();
+		IRHIConstBuffer1* GetBasePassConstBuffer() { return BasePassConstBuffer1.get(); }
+		const std::vector<PrimPtr>& GetPrimitives() { return Primitives; }
 	private:
 		FScene* Scene{nullptr};
-		std::vector<std::unique_ptr<FRenderPrimitive>> Primitives;
+		std::vector<PrimPtr> Primitives;
 		// base pass const buffer
 		std::shared_ptr<TConstBuffer<FViewConstBufferParameter>> BasePassConstBuffer;
 		std::shared_ptr<IRHIConstBuffer1> BasePassConstBuffer1;
@@ -74,10 +80,12 @@ namespace ks
 		void Render();
 		void Shutdown();
 		void SetScene(FRenderScene* _RenderScene) { RenderScene = _RenderScene; }
+		FRenderScene* GetScene() { return RenderScene; }
 
 	private:
 		void Init();
 		void RenderBasePass();
+		void RenderShadowPass();
 		// referenced render scene by this instance
 		FRenderScene* RenderScene{nullptr};
 		// global allocated render scenes management

@@ -14,7 +14,7 @@ namespace ks
 		virtual void Init();
 		virtual void Tick();
 		virtual void Shutdown();
-		void GetWindowSize(int& _ResX, int& _ResY) { _ResX = ResX; _ResY = ResY; }
+		void GetWindowSize(uint32_t& _ResX, uint32_t& _ResY) { _ResX = ResX; _ResY = ResY; }
 		float GetWindowAspect() { return static_cast<float>(ResX) / ResY; }
 
 	protected:
@@ -26,8 +26,8 @@ namespace ks
 		// IApp暂时记录Config参数
 		std::string StartMap;
 		// window settings
-		int WinX, WinY;
-		int ResX, ResY;
+		uint32_t WinX, WinY;
+		uint32_t ResX, ResY;
 	};
 
 	extern KS_API IApp* GApp;

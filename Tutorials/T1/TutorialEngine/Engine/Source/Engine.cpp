@@ -73,8 +73,16 @@ namespace ks
 	{
 		KS_INFO(TEXT("FEngine::Init"));
 
+		uint32_t WindowSizeX, WindowSizeY;
+		GApp->GetWindowSize(WindowSizeX, WindowSizeY);
+		GRHIConfig.ViewPort.Width = WindowSizeX;
+		GRHIConfig.ViewPort.Height = WindowSizeY;
+		GRHIConfig.BackBufferFormat = EELEM_FORMAT::R8G8B8A8_UNORM;
+		GRHIConfig.DepthBufferFormat = EELEM_FORMAT::D24_UNORM_S8_UINT;
+		GRHIConfig.ShadowMapSize = 2048;
+
 		RHI.reset(IRHI::Create());
-		RHI->Init();
+		RHI->Init(GRHIConfig);
 
 		AssetManager.reset(FAssetManager::Create());
 		AssetManager->Init();

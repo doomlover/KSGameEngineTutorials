@@ -1,31 +1,5 @@
 
-cbuffer PrimitiveConstBuffer : register(b0)
-{
-	float4x4 World;
-	float4x4 WorldInvTrans;
-	float4 BaseColorFactor;
-	float4 RoughnessMetallicFactor;
-};
-
-cbuffer PassConstBuffer : register(b1)
-{
-	float4x4 ViewProj;
-	float4 D_LightDirAndIns;
-	float3 EyePosW;
-};
-
-struct Vertex
-{
-	float3 PosL  : POSITION;
-	float3 NormL : NORMAL;
-};
-
-struct Pixel
-{
-	float4 PosH  : SV_POSITION;
-	float4 PosW  : POSITION;
-	float3 NormW : NORMAL;
-};
+#include "Common.hlsl"
 
 Pixel VS(Vertex InVert)
 {
@@ -35,6 +9,8 @@ Pixel VS(Vertex InVert)
 	Out.PosH = mul(Out.PosW, ViewProj);
 	// trans normal from local to world
 	Out.NormW = mul(InVert.NormL, (float3x3)WorldInvTrans);
+	
+    Out.ShadowPosH = mul(Out.PosW, LightProjTex);
 
 	return Out;
 }
@@ -50,6 +26,9 @@ float4 PS(Pixel InPix) : SV_Target
 	float3 H = normalize(ToEye + D_LightDirAndIns.xyz);
 	float HdotN = max(dot(H, NormW), 0.0f);
 	OutColor += 0.65f * pow(HdotN, 32);
+	
+    float ShadowFactor = CalcShadowFactor(InPix.ShadowPosH);
+    OutColor *= ShadowFactor;
 
 	return float4(OutColor, 1.0f);
 }

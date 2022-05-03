@@ -70,33 +70,50 @@ namespace
 		pRootSignature = GD3D12RHI->GetGlobalRootSignature();
 		D3D12Desc.pRootSignature = pRootSignature;
 
-		BuildVertexShader(Shaders, Desc.VertexShaderDesc);
-		BuildPixelShader(Shaders, Desc.PixelShaderDesc);
-		D3D12Desc.VS =
+		if (!Desc.VertexShaderDesc.File.empty())
 		{
-			reinterpret_cast<BYTE*>(Shaders[Desc.VertexShaderDesc.Name]->GetBufferPointer()),
-			Shaders[Desc.VertexShaderDesc.Name]->GetBufferSize()
-		};
-		D3D12Desc.PS =
+			BuildVertexShader(Shaders, Desc.VertexShaderDesc);
+			D3D12Desc.VS =
+			{
+				reinterpret_cast<BYTE*>(Shaders[Desc.VertexShaderDesc.Name]->GetBufferPointer()),
+				Shaders[Desc.VertexShaderDesc.Name]->GetBufferSize()
+			};
+		}
+		if (!Desc.PixelShaderDesc.File.empty())
 		{
-			reinterpret_cast<BYTE*>(Shaders[Desc.PixelShaderDesc.Name]->GetBufferPointer()),
-			Shaders[Desc.PixelShaderDesc.Name]->GetBufferSize()
-		};
+			BuildPixelShader(Shaders, Desc.PixelShaderDesc);
+			D3D12Desc.PS =
+			{
+				reinterpret_cast<BYTE*>(Shaders[Desc.PixelShaderDesc.Name]->GetBufferPointer()),
+				Shaders[Desc.PixelShaderDesc.Name]->GetBufferSize()
+			};
+		}
+
 		D3D12Desc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-		D3D12Desc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
 		D3D12Desc.RasterizerState.FrontCounterClockwise = TRUE;
+		D3D12Desc.RasterizerState.DepthBias = Desc.RasterizerState.DepthBias;
+		D3D12Desc.RasterizerState.DepthBiasClamp = Desc.RasterizerState.DepthBiasClamp;
+		D3D12Desc.RasterizerState.SlopeScaledDepthBias = Desc.RasterizerState.SlopeScaledDepthBias;
 
 		D3D12Desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-
 		D3D12Desc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
-
 		D3D12Desc.SampleMask = UINT_MAX;
-
 		D3D12Desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
-		D3D12Desc.NumRenderTargets = 1;
-		D3D12Desc.RTVFormats[0] = d3d12::GD3D12RHI->GetBackbufferFormat();
-		D3D12Desc.DSVFormat = d3d12::GD3D12RHI->GetDepthbufferFormat();
+		D3D12Desc.NumRenderTargets = Desc.NumRenderTargets;
+		if (Desc.NumRenderTargets)
+		{
+			for (uint32_t i{ 0 }; i < Desc.NumRenderTargets; ++i)
+			{
+				D3D12Desc.RTVFormats[i] = GetDXGIFormat(Desc.RenderTargetFormats[i]);
+			}
+		}
+		else
+		{
+			D3D12Desc.RTVFormats[0] = DXGI_FORMAT_UNKNOWN;
+		}
+		
+		D3D12Desc.DSVFormat = GetDXGIFormat(Desc.DepthBufferFormat);
 
 		D3D12Desc.SampleDesc.Count = 1;
 		D3D12Desc.SampleDesc.Quality = 0;

@@ -138,6 +138,8 @@ namespace ks
 			Direction = DirectionalLight ? DirectionalLight->LightComponent->GetDirection() : glm::vec3(0, 1, 0);
 			Intensity = DirectionalLight ? DirectionalLight->LightComponent->GetIntensity() : 0.f;
 		}
+		FSceneNode* GetLightNode() { return DirectionalLight; }
+		const FBounds& GetSceneBounds() const { return SceneBounds; }
 	private:
 		FSceneNode* Camera{nullptr};
 		FSceneNode* DirectionalLight{nullptr};
@@ -147,5 +149,7 @@ namespace ks
 		std::vector<std::unique_ptr<FSceneNode>> SceneNodes;
 		// rendering
 		FRenderScene* RenderScene{nullptr};
+		// scene bounds
+		FBounds SceneBounds;
 	};
 }
