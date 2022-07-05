@@ -40,4 +40,11 @@ namespace ks::d3d12
 
 	}
 
+	FD3D12RenderTarget::FD3D12RenderTarget(const FTexture2DDesc& Desc)
+		:IRHIRenderTarget(Desc)
+		,FD3D12Texture2D1(Desc)
+	{
+
+	}
+
 }

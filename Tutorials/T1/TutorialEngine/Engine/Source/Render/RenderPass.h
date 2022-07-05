@@ -43,6 +43,9 @@ namespace ks
 		virtual void Begin() override;
 		virtual void Render() override;
 		virtual void End() override;
+		IRHITexture2D* GetSceneColorTexture2D() { return SceneColorMap->GetTexture2D(); }
+	protected:
+		std::shared_ptr<IRHIRenderTarget> SceneColorMap;
 	};
 
 	class FShadowPass : public FRenderPass
@@ -56,6 +59,24 @@ namespace ks
 	protected:
 		std::unique_ptr<IRHIDepthStencilBuffer> ShadowMap;
 
+	};
+
+	class FPostProcessPass : public FRenderPass
+	{
+	public:
+		FPostProcessPass(const FRenderPassDesc& Desc);
+		virtual void Begin() override;
+		virtual void Render() override;
+		virtual void End() override;
+	protected:
+		struct FTriangleMesh
+		{
+			std::vector<uint16_t> Indices;
+			std::vector<glm::vec3> Vertices;
+		};
+		static const FTriangleMesh TriangleMesh;
+		std::shared_ptr<IRHIIndexBuffer1> TriangleMeshIndexBuffer;
+		std::shared_ptr<IRHIVertexBuffer1> TriangleMeshVertexBuffer;
 	};
 }
 

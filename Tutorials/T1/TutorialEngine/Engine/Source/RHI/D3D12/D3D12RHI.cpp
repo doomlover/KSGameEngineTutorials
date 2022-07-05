@@ -31,6 +31,7 @@ namespace ks::d3d12
 			{EELEM_FORMAT::D24_UNORM_S8_UINT,	DXGI_FORMAT::DXGI_FORMAT_D24_UNORM_S8_UINT},
 			{EELEM_FORMAT::R8G8B8A8_UNORM,		DXGI_FORMAT::DXGI_FORMAT_R8G8B8A8_UNORM},
 			{EELEM_FORMAT::R32G32B32_FLOAT,		DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT},
+			{EELEM_FORMAT::R16G16B16A16_FLOAT,	DXGI_FORMAT::DXGI_FORMAT_R16G16B16A16_FLOAT },
 		};
 		return FormatTable.at(ElemFormat);
 	}
@@ -143,8 +144,10 @@ namespace
 	* "CBV(b1)),"
 	*/
 	void CreateGlobalRootSignature(ComPtr<ID3D12RootSignature>& RootSignature) {
+		constexpr int32_t NumRootParameters = 4;
 		// primitive const buffer parameter
 		CD3DX12_DESCRIPTOR_RANGE cbvTable0;
+		/* table_type table_number register_start_index */
 		cbvTable0.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
 
 		// pass const buffer parameter
@@ -152,13 +155,18 @@ namespace
 		cbvTable1.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
 
 		// shadow map parameter
-		CD3DX12_DESCRIPTOR_RANGE SRVTable0;
-		SRVTable0.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
+		CD3DX12_DESCRIPTOR_RANGE ShadowMapSRVTable;
+		ShadowMapSRVTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
 
-		CD3DX12_ROOT_PARAMETER slotRootParameter[3];
+		// scene color map parameter
+		CD3DX12_DESCRIPTOR_RANGE SceneColorMapSRVTable;
+		SceneColorMapSRVTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1);
+
+		CD3DX12_ROOT_PARAMETER slotRootParameter[NumRootParameters];
 		slotRootParameter[0].InitAsDescriptorTable(1, &cbvTable0);
 		slotRootParameter[1].InitAsDescriptorTable(1, &cbvTable1);
-		slotRootParameter[2].InitAsDescriptorTable(1, &SRVTable0, D3D12_SHADER_VISIBILITY_PIXEL);
+		slotRootParameter[2].InitAsDescriptorTable(1, &ShadowMapSRVTable, D3D12_SHADER_VISIBILITY_PIXEL);
+		slotRootParameter[3].InitAsDescriptorTable(1, &SceneColorMapSRVTable, D3D12_SHADER_VISIBILITY_PIXEL);
 
 		// static samplers
 		const CD3DX12_STATIC_SAMPLER_DESC SamplerShadow(
@@ -173,8 +181,21 @@ namespace
 			D3D12_STATIC_BORDER_COLOR_OPAQUE_BLACK
 		);
 
+		const CD3DX12_STATIC_SAMPLER_DESC SamplerLinearClamp(
+			1, // shaderRegister
+			D3D12_FILTER_MIN_MAG_MIP_LINEAR, // filter
+			D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressU
+			D3D12_TEXTURE_ADDRESS_MODE_CLAMP,  // addressV
+			D3D12_TEXTURE_ADDRESS_MODE_CLAMP); // addressW
+
+		std::array<CD3DX12_STATIC_SAMPLER_DESC, 2> staticSamplers =
+		{
+			SamplerShadow, SamplerLinearClamp,
+		};
+
 		// A root signature is an array of root parameters.
-		CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(3, slotRootParameter, 1, &SamplerShadow,
+		CD3DX12_ROOT_SIGNATURE_DESC rootSigDesc(NumRootParameters, slotRootParameter,
+			(UINT)staticSamplers.size(), staticSamplers.data(),
 			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
 		// create a root signature with a single slot which points to a descriptor range consisting of a single constant buffer
@@ -431,7 +452,7 @@ namespace ks::d3d12
 			auto& DefaultRenderTargets{ Context->DefaultRenderTargets };
 			DefaultRenderTargets.clear();
 			DefaultRenderTargets.reserve(SwapChainBufferCount);
-			FRenderTargetDesc Desc;
+			FTexture2DDesc Desc;
 			for (int32_t i{ 0 }; i < SwapChainBufferCount; ++i)
 			{
 				std::unique_ptr<FD3D12RenderTarget> RT = std::make_unique<FD3D12RenderTarget>(Desc);
@@ -577,7 +598,7 @@ namespace ks::d3d12
 		// transition back buffers
 		{
 			CD3DX12_RESOURCE_BARRIER ResBarrier = CD3DX12_RESOURCE_BARRIER::Transition(GetDefaultBackBufferResource(),
-				D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+				D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_GENERIC_READ);
 			GGfxCmdlist->ResourceBarrier(1, &ResBarrier);
 		}
 	}
@@ -589,7 +610,7 @@ namespace ks::d3d12
 		// transition back buffers
 		{
 			CD3DX12_RESOURCE_BARRIER ResBarrier = CD3DX12_RESOURCE_BARRIER::Transition(GetDefaultBackBufferResource(),
-				D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+				D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_PRESENT);
 			D3D12GfxCommandList->ResourceBarrier(1, &ResBarrier);
 		}
 
@@ -1076,23 +1097,33 @@ namespace ks::d3d12
 	void FD3D12RHI::BeginPass()
 	{
 		// transition render target state
-		/*{
-			auto& CurrentRenderTarget{ Context->CurrentRenderTarget };
-			CD3DX12_RESOURCE_BARRIER ResBarrier = CD3DX12_RESOURCE_BARRIER::Transition(CurrentRenderTarget->GetResource(),
-				D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
-			GGfxCmdlist->ResourceBarrier(1, &ResBarrier);
-		}*/
-		// transition depth stencil state
+		auto& CurrentRenderTarget{ Context->CurrentRenderTarget };
+		if (CurrentRenderTarget)
 		{
-			auto& CurrentDepthStencilBuffer{ Context->CurrentDepthStencilBuffer };
-			CD3DX12_RESOURCE_BARRIER ResBarrier = CD3DX12_RESOURCE_BARRIER::Transition(CurrentDepthStencilBuffer->GetResource(),
-				D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_DEPTH_WRITE);
-			GGfxCmdlist->ResourceBarrier(1, &ResBarrier);
+			CD3DX12_RESOURCE_BARRIER RenderTargetBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
+				CurrentRenderTarget->GetResource(),
+				D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_RENDER_TARGET);
+			GGfxCmdlist->ResourceBarrier(1, &RenderTargetBarrier);
 		}
+		
+
+		// transition depth stencil state
+		auto& CurrentDepthStencilBuffer{ Context->CurrentDepthStencilBuffer };
+		CD3DX12_RESOURCE_BARRIER DepthStencilBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
+			CurrentDepthStencilBuffer->GetResource(),
+			D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+		GGfxCmdlist->ResourceBarrier(1, &DepthStencilBarrier);
 	}
 
 	void FD3D12RHI::EndPass()
 	{
+		auto& CurrentRenderTarget{ Context->CurrentRenderTarget };
+		if (CurrentRenderTarget) {
+			
+			CD3DX12_RESOURCE_BARRIER ResBarrier = CD3DX12_RESOURCE_BARRIER::Transition(CurrentRenderTarget->GetResource(),
+				D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_GENERIC_READ);
+			GGfxCmdlist->ResourceBarrier(1, &ResBarrier);
+		}
 		{
 			auto& CurrentDepthStencilBuffer{ Context->CurrentDepthStencilBuffer };
 			CD3DX12_RESOURCE_BARRIER ResBarrier = CD3DX12_RESOURCE_BARRIER::Transition(CurrentDepthStencilBuffer->GetResource(),
@@ -1118,6 +1149,57 @@ namespace ks::d3d12
 		FD3D12Texture2D1* D3D12Texture2D = dynamic_cast<FD3D12Texture2D1*>(Texture2D);
 		const FDescriptorHandle& SRV{D3D12Texture2D->GetViewHandle()};
 		GGfxCmdlist->SetGraphicsRootDescriptorTable(static_cast<UINT>(Texture2D->GetLocationIndex()), SRV.GpuHandle);
+	}
+
+	IRHIRenderTarget* FD3D12RHI::CreateRenderTarget(const FTexture2DDesc& Desc)
+	{
+		FD3D12RenderTarget* RenderTarget = new FD3D12RenderTarget(Desc);
+		auto& D3D12ResComPtr{RenderTarget->GetComPtr()};
+
+		D3D12_RESOURCE_DESC ResDesc{};
+		std::memset(&ResDesc, 0, sizeof(D3D12_RESOURCE_DESC));
+		ResDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+		ResDesc.Alignment = 0;
+		ResDesc.Width = Desc.Width;
+		ResDesc.Height = Desc.Height;
+		ResDesc.DepthOrArraySize = 1;
+		ResDesc.MipLevels = 1;
+		ResDesc.Format = /*DXGI_FORMAT_R16G16B16A16_TYPELESS*/GetDXGIFormat(Desc.Format);
+		ResDesc.SampleDesc.Count = 1;
+		ResDesc.SampleDesc.Quality = 0;
+		ResDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+		ResDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+
+		float ClearColor[] = { 0.f, 0.f, 0.f, 1.f };
+		CD3DX12_CLEAR_VALUE OptClearVal{ GetDXGIFormat(Desc.Format), ClearColor};
+		CD3DX12_HEAP_PROPERTIES HeapProp(D3D12_HEAP_TYPE_DEFAULT);
+		KS_D3D12_CALL(D3D12Device->CreateCommittedResource(
+			&HeapProp,
+			D3D12_HEAP_FLAG_NONE,
+			&ResDesc,
+			D3D12_RESOURCE_STATE_GENERIC_READ,
+			&OptClearVal,
+			IID_PPV_ARGS(&D3D12ResComPtr)
+		));
+
+		D3D12_RENDER_TARGET_VIEW_DESC RTVDesc{};
+		RTVDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+		RTVDesc.Format = GetDXGIFormat(Desc.Format);
+		RTVDesc.Texture2D.MipSlice = 0;
+		RTVDesc.Texture2D.PlaneSlice = 0;
+		RenderTarget->RTVHandle = Context->RTVHeap.Allocate();
+		D3D12Device->CreateRenderTargetView(RenderTarget->GetResource(), &RTVDesc, RenderTarget->RTVHandle.CpuHandle);
+
+		D3D12_SHADER_RESOURCE_VIEW_DESC SRVDesc{};
+		SRVDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		SRVDesc.Format = GetDXGIFormat(Desc.Format);
+		SRVDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+		SRVDesc.Texture2D.MostDetailedMip = 0;
+		SRVDesc.Texture2D.MipLevels = 1;
+		RenderTarget->ViewHandle = Context->CBVHeap.Allocate();
+		D3D12Device->CreateShaderResourceView(RenderTarget->GetResource(), &SRVDesc, RenderTarget->ViewHandle.CpuHandle);
+
+		return RenderTarget;
 	}
 
 }

@@ -75,6 +75,7 @@ namespace ks::d3d12
 		virtual IRHIRenderTarget* GetCurrentBackBuffer() override;
 		virtual IRHIDepthStencilBuffer* GetDefaultDepthStencilBuffer() override;
 		virtual void SetTexture2D(IRHITexture2D* Texture2D) override;
+		virtual IRHIRenderTarget* CreateRenderTarget(const FTexture2DDesc& Desc) override;
 		// static helper functions
 		static d3d12::FD3D12Resource* CreateConstBufferResource(size_t Size);
 		// d3d12 interface

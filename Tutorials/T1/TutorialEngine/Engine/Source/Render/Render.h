@@ -86,6 +86,7 @@ namespace ks
 		void Init();
 		void RenderBasePass();
 		void RenderShadowPass();
+		void RenderPostProcessPass();
 		// referenced render scene by this instance
 		FRenderScene* RenderScene{nullptr};
 		// global allocated render scenes management

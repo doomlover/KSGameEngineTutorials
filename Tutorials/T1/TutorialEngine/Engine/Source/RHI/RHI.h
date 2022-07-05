@@ -44,6 +44,7 @@ namespace ks
 		virtual IRHIRenderTarget* GetCurrentBackBuffer() = 0;
 		virtual IRHIDepthStencilBuffer* GetDefaultDepthStencilBuffer() = 0;
 		virtual void SetTexture2D(IRHITexture2D* Texture2D) = 0;
+		virtual IRHIRenderTarget* CreateRenderTarget(const FTexture2DDesc& Desc) = 0;
 	};
 
 	extern IRHI* GRHI;

@@ -183,13 +183,17 @@ namespace ks::d3d12
 		using IRHITexture2D::IRHITexture2D;
 	};
 
-	class FD3D12RenderTarget : public IRHIRenderTarget, public FD3D12RenderResource
+	class FD3D12RenderTarget : public IRHIRenderTarget, public FD3D12Texture2D1
 	{
 		friend class FD3D12RHI;
 	public:
-		using IRHIRenderTarget::IRHIRenderTarget;
+		FD3D12RenderTarget(const FTexture2DDesc& Desc);
 		void SetRenderTargetView(const FDescriptorHandle& _RTVHandle) { RTVHandle = _RTVHandle; }
 		const FDescriptorHandle& GetRenderTargetView() { return RTVHandle; }
+		virtual IRHITexture2D* GetTexture2D() override
+		{
+			return dynamic_cast<IRHITexture2D*>(this);
+		}
 	private:
 		FDescriptorHandle RTVHandle;
 	};
@@ -198,7 +202,7 @@ namespace ks::d3d12
 	{
 		friend class FD3D12RHI;
 	public:
-		FD3D12DepthStencilBuffer1(const FTexture2DDesc& _Desc);
+		FD3D12DepthStencilBuffer1(const FTexture2DDesc& Desc);
 		const FDescriptorHandle& GetDepthStencilView() { return DSVHandle; }
 		virtual IRHITexture2D* GetTexture2D() override
 		{

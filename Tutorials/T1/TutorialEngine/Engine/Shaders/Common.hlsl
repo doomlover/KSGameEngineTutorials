@@ -1,7 +1,9 @@
 
 Texture2D GShadowMap : register(t0);
+Texture2D GSceneColorMap : register(t1);
 
 SamplerComparisonState GSamplerShadow : register(s0);
+SamplerState GSamplerLinearClamp : register(s1);
 
 cbuffer PrimitiveConstBuffer : register(b0)
 {

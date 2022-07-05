@@ -175,9 +175,10 @@ namespace ks
 	class IRHIRenderTarget
 	{
 	public:
-		IRHIRenderTarget(const FRenderTargetDesc& _Desc) :Desc(_Desc) {}
+		IRHIRenderTarget(const FTexture2DDesc& _Desc) :Desc(_Desc) {}
 		virtual ~IRHIRenderTarget() = 0 {}
+		virtual IRHITexture2D* GetTexture2D() = 0;
 	protected:
-		FRenderTargetDesc Desc;
+		FTexture2DDesc Desc;
 	};
 }

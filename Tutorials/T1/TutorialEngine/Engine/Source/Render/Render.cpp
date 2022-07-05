@@ -140,6 +140,8 @@ namespace ks
 
 		RenderBasePass();
 
+		RenderPostProcessPass();
+
 		GRHI->EndFrame();
 	}
 
@@ -171,7 +173,7 @@ namespace ks
 			Desc.PipelineStateDesc.VertexShaderDesc = { "BasePassVS", util::GetShaderPath("BasePass.hlsl"), "VS" };
 			Desc.PipelineStateDesc.PixelShaderDesc = { "BasePassPS", util::GetShaderPath("BasePass.hlsl"), "PS" };
 			Desc.PipelineStateDesc.NumRenderTargets = 1;
-			Desc.PipelineStateDesc.RenderTargetFormats[0] = GRHIConfig.BackBufferFormat;
+			Desc.PipelineStateDesc.RenderTargetFormats[0] = EELEM_FORMAT::R16G16B16A16_FLOAT;
 			Desc.PipelineStateDesc.DepthBufferFormat = GRHIConfig.DepthBufferFormat;
 			FRenderPass* Pass = FRenderPass::CreatePass<FBasePass>(Desc);
 			assert(Pass);
@@ -200,11 +202,32 @@ namespace ks
 			FRenderPass* Pass = FRenderPass::CreatePass<FShadowPass>(Desc);
 			assert(Pass);
 		}
+
+		// setup post process pass
+		{
+			FRenderPassDesc Desc;
+			Desc.Name = "PostProcessPass";
+			Desc.ViewPort = GRHIConfig.ViewPort;
+			Desc.Renderer = this;
+			Desc.PipelineStateDesc.InputLayout = {
+				/*SemanticName, SemanticIndex, Format, InputSlot, Stride*/
+				{"POSITION", 0, EELEM_FORMAT::R32G32B32_FLOAT, 0, 0}
+			};
+			const std::string ShaderFileName{"PostProcess.hlsl"};
+			Desc.PipelineStateDesc.VertexShaderDesc = {"PostProcessVS", util::GetShaderPath(ShaderFileName), "VS"};
+			Desc.PipelineStateDesc.PixelShaderDesc = {"PostProcessPS", util::GetShaderPath(ShaderFileName), "PS"};
+			Desc.PipelineStateDesc.NumRenderTargets = 1;
+			Desc.PipelineStateDesc.RenderTargetFormats[0] = GRHIConfig.BackBufferFormat;
+			Desc.PipelineStateDesc.DepthBufferFormat = GRHIConfig.DepthBufferFormat;
+			Desc.PipelineStateDesc.DepthStencilState.DepthEnable = 0;
+			FRenderPass* Pass = FRenderPass::CreatePass<FPostProcessPass>(Desc);
+			assert(Pass);
+		}
 	}
 
 	void FRenderer::RenderBasePass()
 	{
-		FRenderPass* Pass = FRenderPass::GetPass("BasePass");
+		static FRenderPass* Pass = FRenderPass::GetPass("BasePass");
 		Pass->Begin();
 		Pass->Render();
 		Pass->End();
@@ -213,6 +236,14 @@ namespace ks
 	void FRenderer::RenderShadowPass()
 	{
 		static FRenderPass* Pass = FRenderPass::GetPass("ShadowPass");
+		Pass->Begin();
+		Pass->Render();
+		Pass->End();
+	}
+
+	void FRenderer::RenderPostProcessPass()
+	{
+		static FRenderPass* Pass = FRenderPass::GetPass("PostProcessPass");
 		Pass->Begin();
 		Pass->Render();
 		Pass->End();

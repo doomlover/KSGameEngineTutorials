@@ -19,7 +19,12 @@ namespace ks
 	FBasePass::FBasePass(const FRenderPassDesc& _Desc)
 		:FRenderPass(_Desc)
 	{
-		
+		FTexture2DDesc SceneColorDesc;
+		SceneColorDesc.Width = Desc.ViewPort.Width;
+		SceneColorDesc.Height = Desc.ViewPort.Height;
+		SceneColorDesc.Format = _Desc.PipelineStateDesc.RenderTargetFormats[0];
+		SceneColorMap.reset(GRHI->CreateRenderTarget(SceneColorDesc));
+		SceneColorMap->GetTexture2D()->SetLocationIndex(3);
 	}
 
 	FBasePass::~FBasePass()
@@ -33,12 +38,13 @@ namespace ks
 		GRHI->SetViewports(1, &Desc.ViewPort);
 
 		// set render target and depth stencil buffer
-		GRHI->SetRenderTarget(GRHI->GetCurrentBackBuffer(), GRHI->GetDefaultDepthStencilBuffer());
+		//GRHI->SetRenderTarget(GRHI->GetCurrentBackBuffer(), GRHI->GetDefaultDepthStencilBuffer());
+		GRHI->SetRenderTarget(SceneColorMap.get(), GRHI->GetDefaultDepthStencilBuffer());
 
 		GRHI->BeginPass();
 
 		// Clear the back buffer
-		GRHI->ClearRenderTarget(color::LightSteelBlue);
+		GRHI->ClearRenderTarget(color::Black);
 
 		// clear the depth buffer
 		GRHI->ClearDepthStencilBuffer();
@@ -156,5 +162,48 @@ namespace ks
 	{
 		GRHI->EndPass();
 	}
+
+	const FPostProcessPass::FTriangleMesh FPostProcessPass::TriangleMesh = {
+		{0, 2, 1},
+		{{-3.f, -1.f, 0.f}, {1.f, 3.f, 0.f}, {1.f, -1.f, 0.f}}
+	};
+
+	FPostProcessPass::FPostProcessPass(const FRenderPassDesc& Desc)
+		:FRenderPass(Desc)
+	{
+		constexpr uint32_t Stride = sizeof(float) * 3;
+		auto RHIIndexBuffer = GRHI->CreateIndexBuffer1(EELEM_FORMAT::R16_UINT, 3, static_cast<uint32_t>(TriangleMesh.Indices.size() * sizeof(uint16_t)), TriangleMesh.Indices.data());
+		TriangleMeshIndexBuffer.reset(RHIIndexBuffer);
+		auto RHIVertexBuffer = GRHI->CreateVertexBuffer1(Stride, static_cast<uint32_t>(TriangleMesh.Vertices.size() * sizeof(glm::vec3)), TriangleMesh.Vertices.data());
+		TriangleMeshVertexBuffer.reset(RHIVertexBuffer);
+	}
+
+	void FPostProcessPass::Begin()
+	{
+		GRHI->SetViewports(1, &Desc.ViewPort);
+		GRHI->SetRenderTarget(GRHI->GetCurrentBackBuffer(), GRHI->GetDefaultDepthStencilBuffer());
+		GRHI->BeginPass();
+		GRHI->ClearRenderTarget(color::Red);
+		GRHI->ClearDepthStencilBuffer();
+	}
+
+	void FPostProcessPass::Render()
+	{
+		GRHI->SetPipelineState(RHIPipelineState.get());
+
+		// bind scene color texture
+		FBasePass* BasePass = dynamic_cast<FBasePass*>(FRenderPass::GetPass("BasePass"));
+		IRHITexture2D* SceneColorTexture2D = BasePass->GetSceneColorTexture2D();
+		GRHI->SetTexture2D(SceneColorTexture2D);
+
+		GRHI->SetVertexBuffer1(TriangleMeshVertexBuffer.get());
+		GRHI->DrawIndexedPrimitive1(TriangleMeshIndexBuffer.get());
+	}
+
+	void FPostProcessPass::End()
+	{
+		GRHI->EndPass();
+	}
+	
 
 }

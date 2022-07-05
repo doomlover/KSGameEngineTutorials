@@ -90,13 +90,14 @@ namespace
 		}
 
 		D3D12Desc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-		D3D12Desc.RasterizerState.FrontCounterClockwise = TRUE;
+		D3D12Desc.RasterizerState.FrontCounterClockwise = Desc.RasterizerState.FrontCounterClockwise;
 		D3D12Desc.RasterizerState.DepthBias = Desc.RasterizerState.DepthBias;
 		D3D12Desc.RasterizerState.DepthBiasClamp = Desc.RasterizerState.DepthBiasClamp;
 		D3D12Desc.RasterizerState.SlopeScaledDepthBias = Desc.RasterizerState.SlopeScaledDepthBias;
 
 		D3D12Desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 		D3D12Desc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+		D3D12Desc.DepthStencilState.DepthEnable = Desc.DepthStencilState.DepthEnable;
 		D3D12Desc.SampleMask = UINT_MAX;
 		D3D12Desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 

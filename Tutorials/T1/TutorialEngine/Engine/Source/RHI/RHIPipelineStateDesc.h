@@ -36,9 +36,14 @@ namespace ks
 	{
 		struct FRasterizerState
 		{
+			int32_t FrontCounterClockwise{1};
 			int32_t DepthBias{0};
 			float DepthBiasClamp{0.f};
 			float SlopeScaledDepthBias{0.f};
+		};
+		struct FDepthStencilState
+		{
+			int32_t DepthEnable = 1;
 		};
 		std::vector<FInputElemDesc> InputLayout;
 		FVertexShaderDesc VertexShaderDesc;
@@ -47,5 +52,6 @@ namespace ks
 		EELEM_FORMAT RenderTargetFormats[8];
 		EELEM_FORMAT DepthBufferFormat;
 		FRasterizerState RasterizerState;
+		FDepthStencilState DepthStencilState;
 	};
 }

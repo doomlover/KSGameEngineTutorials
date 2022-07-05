@@ -63,6 +63,7 @@ namespace ks
 		R8G8B8A8_UNORM,
 		R32G32B32_FLOAT,
 		R32G32B32A32_FLOAT,
+		R16G16B16A16_FLOAT,
 	};
 
 	using FColor = float[4];
@@ -127,4 +128,6 @@ namespace util
 namespace ks::color
 {
 	const FColor LightSteelBlue={ 0.690196097f, 0.768627524f, 0.870588303f, 1.000000000f };
+	const FColor Red = { 1.000000000f, 0.000000000f, 0.000000000f, 1.000000000f };
+	const FColor Black = {0.000000000f, 0.000000000f, 0.000000000f, 1.000000000f};
 }
